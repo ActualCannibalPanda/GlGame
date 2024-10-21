@@ -60,3 +60,4 @@ CMakeUserPresets.json
 vcpkg_installed/
 external/vcpkg/*
 build/
+.cache/

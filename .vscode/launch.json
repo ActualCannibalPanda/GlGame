@@ -6,9 +6,14 @@
   "configurations": [
     {
       "name": "Launch",
-      "type": "cppvsdbg",
+      "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceRoot}/build/GlCraft/GlCraft.exe",
+      "windows": {
+        "program": "${workspaceRoot}/build/GlCraft/GlCraft.exe"
+      },
+      "linux": {
+        "program": "${workspaceRoot}/build/GlCraft/GlCraft"
+      },
       "cwd": "${workspaceRoot}/build/GlCraft/"
     },
     {
@@ -16,7 +21,7 @@
       "request": "launch",
       "name": "Debug portfile(s)",
       "cmakeDebugType": "external",
-      "pipeName": "\\\\.\\pipe\\vcpkg_ext_portfile_dbg",
+      "pipeName": "/tmp/vcpkg_ext_portfile_dbg",
       "preLaunchTask": "Debug vcpkg commands"
     }
   ]

@@ -24,7 +24,7 @@ else ()
    )
 endif ()
 
-target_include_directories(${PROGRAM_NAME} PRIVATE OPENGL_INCLUDE_DIR glm_INCLUDE_DIR glfw3_INCLUDE_DIR)
+target_include_directories(${PROGRAM_NAME} PRIVATE OPENGL_INCLUDE_DIR glm_INCLUDE_DIR glfw3_INCLUDE_DIR include/)
 
 target_link_libraries(${PROGRAM_NAME} PRIVATE glm::glm glfw OpenGL::GL ${LIB_NAME})
 

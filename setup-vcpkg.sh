@@ -4,4 +4,4 @@
 export VCPKG_ROOT=$(pwd)/external/vcpkg
 export PATH=$VCPKG_ROOT:$PATH
 
-vcpkg install
+vcpkg install --triplet x64-linux

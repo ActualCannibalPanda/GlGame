@@ -24,12 +24,19 @@ else ()
    )
 endif ()
 
+include_directories(include)
+
+set(PROJECT_LIB "${PROJECT_NAME}-lib")
+add_subdirectory(lib)
+
 target_include_directories(${PROGRAM_NAME} PRIVATE OPENGL_INCLUDE_DIR glm_INCLUDE_DIR glfw3_INCLUDE_DIR include/)
 
-target_link_libraries(${PROGRAM_NAME} PRIVATE glm::glm glfw OpenGL::GL ${LIB_NAME})
+target_link_libraries(${PROGRAM_NAME} PRIVATE glm::glm glfw OpenGL::GL ${LIB_NAME} ${PROJECT_LIB})
 
 # Web Configurations
 if ("${PLATFORM}" STREQUAL "Web")
    set_target_properties(${PROGRAM_NAME} PROPERTIES SUFFIX ".html")
    target_link_options(${PROGRAM_NAME} PUBLIC -sUSE_GLFW=3 PUBLIC --preload-file data)
 endif ()
+
+add_subdirectory(tests)

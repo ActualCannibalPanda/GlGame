@@ -13,4 +13,4 @@ include_directories(include)
 include_directories(external/GLAD/include)
 
 add_subdirectory(external)
-add_subdirectory(src)
+add_subdirectory(GlCraft)

@@ -1,7 +1,3 @@
 {
-  "dependencies": [
-    "glfw3",
-    "glm",
-    "catch2"
-  ]
+  "dependencies": ["sdl2", "glm", "catch2"]
 }

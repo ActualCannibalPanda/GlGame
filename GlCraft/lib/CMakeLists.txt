@@ -1,8 +1,10 @@
 file(GLOB_RECURSE LIB_FILES CONFIGURE_DEPENDS *.cpp)
 
 add_library(${PROJECT_LIB} STATIC ${LIB_FILES})
-target_include_directories(${PROJECT_LIB} PRIVATE OPENGL_INCLUDE_DIR glm_INCLUDE_DIR glfw3_INCLUDE_DIR)
-target_link_libraries(${PROJECT_LIB} PRIVATE glm::glm glfw OpenGL::GL ${LIB_NAME})
+target_include_directories(${PROJECT_LIB} PRIVATE OPENGL_INCLUDE_DIR glm_INCLUDE_DIR SDL2_INCLUDE_DIR)
+target_link_libraries(${PROJECT_LIB} PRIVATE glm::glm OpenGL::GL ${LIB_NAME}
+        $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+        $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>)
 
 set_target_properties(${PROJECT_LIB} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_LIB}

@@ -1,6 +1,6 @@
 add_executable(${PROGRAM_NAME})
 
-find_package(glfw3 CONFIG REQUIRED)
+find_package(SDL2 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_package(OpenGL REQUIRED)
 
@@ -29,9 +29,11 @@ include_directories(include)
 set(PROJECT_LIB "${PROJECT_NAME}-lib")
 add_subdirectory(lib)
 
-target_include_directories(${PROGRAM_NAME} PRIVATE OPENGL_INCLUDE_DIR glm_INCLUDE_DIR glfw3_INCLUDE_DIR include/)
+target_include_directories(${PROGRAM_NAME} PRIVATE OPENGL_INCLUDE_DIR glm_INCLUDE_DIR SDL2_INCLUDE_DIR include/)
 
-target_link_libraries(${PROGRAM_NAME} PRIVATE glm::glm glfw OpenGL::GL ${LIB_NAME} ${PROJECT_LIB})
+target_link_libraries(${PROGRAM_NAME} PRIVATE glm::glm OpenGL::GL ${LIB_NAME} ${PROJECT_LIB}
+    $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+    $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>)
 
 # Web Configurations
 if ("${PLATFORM}" STREQUAL "Web")

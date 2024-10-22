@@ -1,36 +1,53 @@
 #include "assetdir.hpp"
 #include "shader.hpp"
 #include "types.hpp"
+#include <SDL2/SDL_video.h>
 #include <iostream>
 
 #include <glad/glad.h>
 // Keeo glad above this
-#include <GLFW/glfw3.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
 
 float vertices[] = {-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f};
 
-int main(int argc, char **argv) {
-  glfwInit();
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
+constexpr int SCREEN_WIDTH = 800;
+constexpr int SCREEN_HEIGHT = 600;
 
-  GLFWwindow *window = glfwCreateWindow(800, 600, "GlCraft", nullptr, nullptr);
-  if (window == nullptr) {
-    std::cout << "Failed to create GLFW window" << std::endl;
-    glfwTerminate();
+int main(int argc, char **argv) {
+  if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+    std::cout << "Failed to start SDL: " << SDL_GetError() << std::endl;
+  }
+
+  SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+
+  SDL_Window *window = SDL_CreateWindow("GlCraft", 100, 100, SCREEN_WIDTH,
+                                        SCREEN_HEIGHT, SDL_WINDOW_OPENGL);
+  if (!window) {
+    std::cerr << "Failed to create window: " << SDL_GetError() << std::endl;
     return -1;
   }
-  glfwMakeContextCurrent(window);
+  SDL_GLContext context = SDL_GL_CreateContext(window);
+  // GLFWwindow *window = glfwCreateWindow(800, 600, "GlCraft", nullptr,
+  // nullptr); if (window == nullptr) {
+  //   std::cout << "Failed to create GLFW window" << std::endl;
+  //   glfwTerminate();
+  //   return -1;
+  // }
+  // glfwMakeContextCurrent(window);
 
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+  if (!gladLoadGLLoader(
+          reinterpret_cast<GLADloadproc>(SDL_GL_GetProcAddress))) {
     std::cout << "Failed to initialize GLAD" << std::endl;
     return -1;
   }
+  SDL_GL_SetSwapInterval(1);
 
+  glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
   glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
   craft::Shader shader(craft::SHADER_DIR.GetFile("simple.vert"),
@@ -40,6 +57,7 @@ int main(int argc, char **argv) {
   craft::vao_t VAO;
   glGenVertexArrays(1, &VAO);
   glBindVertexArray(VAO);
+
   craft::vbo_t VBO;
   glGenBuffers(1, &VBO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -48,7 +66,14 @@ int main(int argc, char **argv) {
   glEnableVertexAttribArray(0);
   glBindVertexArray(0);
 
-  while (!glfwWindowShouldClose(window)) {
+  bool running = true;
+  while (running) {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+      if (event.type == SDL_QUIT) {
+        running = false;
+      }
+    }
     glClearColor(0.5, 0.2, 0.7, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -56,11 +81,8 @@ int main(int argc, char **argv) {
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    glfwSwapBuffers(window);
-    glfwPollEvents();
+    SDL_GL_SwapWindow(window);
   }
 
-  glfwDestroyWindow(window);
-  glfwTerminate();
   return 0;
 }

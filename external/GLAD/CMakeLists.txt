@@ -1,8 +1,10 @@
-file(GLOB SOURCES *.c)
 add_library(${LIB_NAME} STATIC)
 
-target_sources(${LIB_NAME} PRIVATE ${SOURCES})
-
+if (DEFINED EMSCRIPTEN)
+target_sources(${LIB_NAME} PRIVATE egl.c gles2.c)
+else()
+target_sources(${LIB_NAME} PRIVATE gl.c)
+endif()
 set_target_properties(${LIB_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${LIB_NAME}
     CXX_STANDARD 20)

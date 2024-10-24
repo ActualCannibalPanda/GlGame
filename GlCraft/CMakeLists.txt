@@ -1,16 +1,10 @@
 add_executable(${PROGRAM_NAME})
 
-find_package(SDL2 CONFIG REQUIRED)
-find_package(glm CONFIG REQUIRED)
-find_package(OpenGL REQUIRED)
-
-set_target_properties(${PROGRAM_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}
-    CXX_STANDARD 20)
-
-file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp)
-
-target_sources(${PROGRAM_NAME} PRIVATE ${SOURCE_FILES})
+if(NOT DEFINED EMSCRIPTEN)
+    find_package(SDL2 CONFIG REQUIRED)
+    find_package(glm CONFIG REQUIRED)
+    find_package(OpenGL REQUIRED)
+endif()
 
 if ("${PLATFORM}" STREQUAL "Web")
    add_custom_command(
@@ -26,19 +20,73 @@ endif ()
 
 include_directories(include)
 
-set(PROJECT_LIB "${PROJECT_NAME}-lib")
-add_subdirectory(lib)
 
-target_include_directories(${PROGRAM_NAME} PRIVATE OPENGL_INCLUDE_DIR glm_INCLUDE_DIR SDL2_INCLUDE_DIR include/)
+if (DEFINED EMSCRIPTEN)
+    add_compile_definitions("__EMSCRIPTEN__")
+    set(USE_FLAGS "-sUSE_SDL=2")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USE_FLAGS}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${USE_FLAGS}")
+    target_link_options(${PROJECT_NAME} PUBLIC
+        "-sMODULARIZE=1"
+        "-sEXPORT_NAME='Main'"
+        "-sINVOKE_RUN=0"
+        "-sDISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=0"
+        "-sEXPORTED_FUNCTIONS=['_main']"
+        "-sEXPORTED_RUNTIME_METHODS=['callMain', 'ccall', 'cwrap']"
+        "-sFORCE_FILESYSTEM=1"
+        "-sALLOW_MEMORY_GROWTH=1" 
+        "-sASYNCIFY"
+        "-sFETCH"
+        "-sMIN_WEBGL_VERSION=2"
+        "--preload-file ${CMAKE_SOURCE_DIR}/data"
+        "-O2"
+    )
+    file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp)
 
-target_link_libraries(${PROGRAM_NAME} PRIVATE glm::glm OpenGL::GL ${LIB_NAME} ${PROJECT_LIB}
-    $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
-    $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>)
+    target_sources(${PROGRAM_NAME} PRIVATE ${SOURCE_FILES})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${LIB_NAME})
 
-# Web Configurations
-if ("${PLATFORM}" STREQUAL "Web")
-   set_target_properties(${PROGRAM_NAME} PROPERTIES SUFFIX ".html")
-   target_link_options(${PROGRAM_NAME} PUBLIC -sUSE_GLFW=3 PUBLIC --preload-file data)
-endif ()
+    add_custom_command(
+        TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_SOURCE_DIR}/index.html
+                ${CMAKE_BINARY_DIR}/${PROJECT_NAME}/index.html
+        )
+else()
+    set(extra_flags "")
+    if (NOT MSVC)
+        set(extra_flags "-mconsole")
+    endif()
 
-add_subdirectory(tests)
+    file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp)
+    #############################
+    # LIB
+    set(LIB_FILES ${SOURCE_FILES})
+    list(REMOVE_ITEM LIB_FILES src/main.cpp)
+
+    add_library(${PROJECT_LIB} STATIC)
+    target_sources(${PROJECT_LIB} PRIVATE ${LIB_FILES})
+    set_target_properties(${PROJECT_LIB} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_LIB}
+        CXX_STANDARD 20)
+
+    target_include_directories(${PROJECT_LIB} PRIVATE OPENGL_INCLUDE_DIR glm_INCLUDE_DIR SDL2_INCLUDE_DIR)
+    target_link_libraries(${PROJECT_LIB} PRIVATE glm::glm OpenGL::GL ${LIB_NAME}
+            $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+            $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>)
+
+    ############################
+    # PROJECT
+    set_target_properties(${PROGRAM_NAME} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}
+        CXX_STANDARD 20)
+
+    target_sources(${PROGRAM_NAME} PRIVATE src/main.cpp)
+    
+    target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm OpenGL::GL ${LIB_NAME} ${PROJECT_LIB}
+        $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+        $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>)
+    target_include_directories(${PROGRAM_NAME} PRIVATE OPENGL_INCLUDE_DIR glm_INCLUDE_DIR SDL2_INCLUDE_DIR include/)
+
+    add_subdirectory(tests)
+endif()

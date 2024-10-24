@@ -11,6 +11,14 @@
       "environment": {
         "VCPKG_ROOT": "${sourceDir}/external/vcpkg"
       }
+    },
+    {
+      "name": "vcpkg - web",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/buildweb",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake"
+      }
     }
   ]
 }

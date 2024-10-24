@@ -1,12 +1,14 @@
 #ifndef __HPP_GLCRAFT_SHADER__
 #define __HPP_GLCRAFT_SHADER__
 
+#include <string>
+
 #include "types.hpp"
 
 namespace craft {
 class Shader {
 public:
-  Shader(const craft::path& vertFile, const craft::path& fragFile);
+  Shader(const std::string& vertFile, const std::string& fragFile);
 
   void Use() const;
 

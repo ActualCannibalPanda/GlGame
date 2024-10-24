@@ -4,5 +4,6 @@
 #include <filesystem>
 
 TEST_CASE("Factorials are computed", "[factorial]") {
-  REQUIRE(std::filesystem::exists(craft::SHADER_DIR.GetFile("simple.frag")));
+  REQUIRE(std::filesystem::exists(
+      craft::AssetDir({"./data/shaders/"}).GetFile("simple.frag")));
 }

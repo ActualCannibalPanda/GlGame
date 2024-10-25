@@ -7,9 +7,9 @@ using namespace craft;
 AssetDir::AssetDir(std::initializer_list<std::string> paths)
 #ifdef __EMSCRIPTEN__
     : m_BaseDir{} {
-#else
+#else /* !__EMSCRIPTEN__ */
     : m_BaseDir{std::filesystem::current_path()} {
-#endif
+#endif /* __EMSCRIPTEN__ */
   for (const auto& path : paths) {
     m_BaseDir /= path;
   }

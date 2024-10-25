@@ -1,19 +1,20 @@
-#include "shader.hpp"
 #include <cstdio>
 #include <string.h>
 
+// clang-format: off
 #ifdef __EMSCRIPTEN__
-#include <glad/egl.h>
-#include <glad/gles2.h>
+#  include <glad/egl.h>
+#  include <glad/gles2.h>
 
-#include <emscripten.h>
-#include <emscripten/fetch.h>
-#else
-#include <glad/gl.h>
+#  include <emscripten.h>
+#  include <emscripten/fetch.h>
+#else /* !__EMSCRIPTEN__ */
+# include <glad/gl.h>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
-#endif
+# include <SDL2/SDL.h>
+# include <SDL2/SDL_opengl.h>
+#endif /* __EMSCRIPTEN__ */
+// clang-format: on
 
 #include <cstdio>
 #include <filesystem>
@@ -21,6 +22,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "shader.hpp"
 #include "assetdir.hpp"
 #include "types.hpp"
 
@@ -28,9 +30,9 @@ using namespace craft;
 
 #ifdef __EMSCRIPTEN__
 static const AssetDir SHADER_DIR{"/", "data", "shaders", "gles"};
-#else
+#else /* !__EMSCRIPTEN__ */
 static const AssetDir SHADER_DIR{"data", "shaders"};
-#endif
+#endif /* __EMSCRIPTEN__ */
 
 #ifdef __EMSCRIPTEN__
 void onSuccess(emscripten_fetch_t *fetch);
@@ -84,8 +86,7 @@ void onError(emscripten_fetch_t *fetch) {
   f->__set_job_done(false, nullptr);
   emscripten_fetch_close(fetch);
 }
-
-#endif
+#endif /* __EMSCRIPTEN__ */
 
 Shader::Shader(const std::string& vertFile, const std::string& fragFile) {
   auto vFile = SHADER_DIR.GetFile(vertFile.c_str());
@@ -103,7 +104,7 @@ Shader::Shader(const std::string& vertFile, const std::string& fragFile) {
   }
   const char *vcode = vFetch.getData();
   const char *fcode = fFetch.getData();
-#else
+#else /* !__EMSCRIPTEN__ */
   std::string vertexCode;
   std::string fragCode;
   std::ifstream vertfs;
@@ -124,7 +125,7 @@ Shader::Shader(const std::string& vertFile, const std::string& fragFile) {
   }
   const char *vcode = vertexCode.c_str();
   const char *fcode = fragCode.c_str();
-#endif
+#endif /* __EMSCRIPTEN__ */
 
   craft::shader_t vert = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vert, 1, &vcode, nullptr);

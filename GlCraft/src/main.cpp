@@ -1,55 +1,55 @@
-#include "shader.hpp"
-#include "types.hpp"
-#include <SDL_video.h>
 #include <iostream>
 
-// Keeo glad above this
-
+// clang-format: off
 #ifdef __EMSCRIPTEN__
-#include <glad/egl.h>
-#include <glad/gles2.h>
-#define SDL_MAIN_HANDLED
-#include <SDL.h>
-#include <SDL_opengles2.h>
+# include <glad/egl.h>
+# include <glad/gles2.h>
+# define SDL_MAIN_HANDLED
+# include <SDL.h>
+# include <SDL_opengles2.h>
 
-#include <emscripten.h>
-#else
-#include <glad/gl.h>
+# include <emscripten.h>
+#else /* !__EMSCRIPTEN__*/
+# include <glad/gl.h>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
-#endif
+# include <SDL2/SDL.h>
+# include <SDL2/SDL_opengl.h>
+#endif /* __EMSCRIPTEN__ */
+
+#include "shader.hpp"
+#include "types.hpp"
+
+#ifndef __EMSCRIPTEN__
+# define MAIN_LOOP_BEGIN                                                        \
+    bool running = true;                                                         \
+    do
+# define MAIN_LOOP_END while(running)
+# define CHECK_SHOULD_QUIT                                                      \
+    case SDL_QUIT:                                                               \
+      running = false;                                                           \
+      break
+#else /* !__EMSCRIPTEN__*/
+# define MAIN_LOOP_BEGIN
+# define MAIN_LOOP_END
+# define CHECK_SHOULD_QUIT
+#endif /* __EMSCRIPTEN__ */
+// clang-format: on
 
 SDL_Window *window;
 
-#ifndef __EMSCRIPTEN__
-#define MAIN_LOOP_BEGIN                                                        \
-  bool running = true;                                                         \
-  while (running) {
-#define MAIN_LOOP_END }
-#define CHECK_SHOULD_QUIT                                                      \
-  case SDL_QUIT:                                                               \
-    running = false;                                                           \
-    break
-#else
-#define MAIN_LOOP_BEGIN
-#define MAIN_LOOP_END
-#define CHECK_SHOULD_QUIT
-#endif
-
 void mainLoop() {
-  MAIN_LOOP_BEGIN
-  SDL_Event event;
-  while (SDL_PollEvent(&event)) {
-    switch (event.type) { CHECK_SHOULD_QUIT; }
-  }
-  glClearColor(0.5, 0.2, 0.7, 1.0);
-  glClear(GL_COLOR_BUFFER_BIT);
+  MAIN_LOOP_BEGIN {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+      switch (event.type) { CHECK_SHOULD_QUIT; }
+    }
+    glClearColor(0.5, 0.2, 0.7, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-  glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
-  SDL_GL_SwapWindow(window);
-  MAIN_LOOP_END
+    SDL_GL_SwapWindow(window);
+  } MAIN_LOOP_END;
 }
 
 float vertices[] = {-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f};
@@ -65,10 +65,10 @@ int main(int argc, char **argv) {
   SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#else
+#else /* __EMSCRIPTEN__*/
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#endif
+#endif /* !__EMSCRIPTEN__ */
 
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
@@ -87,9 +87,9 @@ int main(int argc, char **argv) {
     std::cout << "Failed to initialize GLAD" << std::endl;
     return -1;
   }
-#else
+#else /* __EMSCRIPTEN__ */
   gladLoaderLoadGLES2();
-#endif
+#endif /* !__EMSCRIPTEN__ */
 
   SDL_GL_SetSwapInterval(1);
 
@@ -113,9 +113,9 @@ int main(int argc, char **argv) {
 #ifdef __EMSCRIPTEN__
   int fps = 0;
   emscripten_set_main_loop(mainLoop, fps, true);
-#else
+#else /* !__EMSCRIPTEN__ */
   mainLoop();
-#endif
+#endif /* __EMSCRIPTEN__ */
 
   return 0;
 }

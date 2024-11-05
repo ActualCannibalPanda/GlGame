@@ -5,5 +5,5 @@
 
 TEST_CASE("Factorials are computed", "[factorial]") {
   REQUIRE(std::filesystem::exists(
-      craft::AssetDir({"./data/shaders/"}).GetFile("simple.frag")));
+      glgame::AssetDir({"./data/shaders/"}).GetFile("simple.frag")));
 }

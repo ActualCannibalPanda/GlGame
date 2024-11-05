@@ -1,16 +1,16 @@
-#ifndef __HPP_GLCRAFT_TYPES__
-#define __HPP_GLCRAFT_TYPES__
+#ifndef __HPP_GLGAME_TYPES__
+#define __HPP_GLGAME_TYPES__
 
 #include <cstdint>
 
 #include <filesystem>
 
-namespace craft {
+namespace glgame {
 typedef uint32_t vao_t;
 typedef uint32_t vbo_t;
 typedef uint32_t program_t;
 typedef uint32_t shader_t;
 typedef std::filesystem::path path;
-} // namespace craft
+} // namespace glgame
 
-#endif /*  __HPP_GLCRAFT_TYPES__ */
+#endif /*  __HPP_GLGAME_TYPES__ */

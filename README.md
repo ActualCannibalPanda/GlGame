@@ -1,4 +1,4 @@
-# GlCraft
+# GlGame
 
 OpenGL Game (undecided as just getting some rendering going)
 

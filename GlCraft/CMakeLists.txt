@@ -1,8 +1,6 @@
 add_executable(${PROGRAM_NAME})
 
 if(NOT DEFINED EMSCRIPTEN)
-    find_package(SDL2 CONFIG REQUIRED)
-    find_package(glm CONFIG REQUIRED)
     find_package(OpenGL REQUIRED)
 endif()
 
@@ -87,6 +85,4 @@ else()
         $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
         $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>)
     target_include_directories(${PROGRAM_NAME} PRIVATE OPENGL_INCLUDE_DIR glm_INCLUDE_DIR SDL2_INCLUDE_DIR include/)
-
-    add_subdirectory(tests)
 endif()

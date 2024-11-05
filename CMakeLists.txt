@@ -19,5 +19,5 @@ endif(WIN32)
 include_directories(external/GLAD/include)
 include_directories(include)
 
-add_subdirectory(external)
 add_subdirectory(GlCraft)
+add_subdirectory(external)

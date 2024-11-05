@@ -2,18 +2,14 @@
   "version": 2,
   "configurePresets": [
     {
-      "name": "vcpkg",
+      "name": "Desktop",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build",
-      "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
-      },
-      "environment": {
-        "VCPKG_ROOT": "${sourceDir}/external/vcpkg"
-      }
+      "cacheVariables": {},
+      "environment": {}
     },
     {
-      "name": "vcpkg - web",
+      "name": "Web",
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/buildweb",
       "cacheVariables": {

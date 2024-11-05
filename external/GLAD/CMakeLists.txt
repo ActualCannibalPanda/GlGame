@@ -11,4 +11,6 @@ set_target_properties(${LIB_NAME} PROPERTIES
 
 set_target_properties(${LIB_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(${LIB_NAME} PRIVATE include)
+target_include_directories(${PROJECT_NAME} PRIVATE include)
+
 

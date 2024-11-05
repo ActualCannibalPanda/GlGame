@@ -57,24 +57,6 @@ else()
     endif()
 
     file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp)
-    #############################
-    # LIB
-    set(LIB_FILES ${SOURCE_FILES})
-    list(REMOVE_ITEM LIB_FILES src/main.cpp)
-
-    add_library(${PROJECT_LIB} STATIC)
-    target_sources(${PROJECT_LIB} PRIVATE ${LIB_FILES})
-    set_target_properties(${PROJECT_LIB} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_LIB}
-        CXX_STANDARD 20)
-
-    target_include_directories(${PROJECT_LIB} PRIVATE OPENGL_INCLUDE_DIR glm_INCLUDE_DIR SDL2_INCLUDE_DIR)
-    target_link_libraries(${PROJECT_LIB} PRIVATE glm::glm OpenGL::GL ${LIB_NAME}
-            $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
-            $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>)
-
-    ############################
-    # PROJECT
     set_target_properties(${PROGRAM_NAME} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}
         CXX_STANDARD 20)

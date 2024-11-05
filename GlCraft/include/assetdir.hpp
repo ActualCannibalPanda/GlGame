@@ -1,5 +1,5 @@
-#ifndef __HPP_GLCRAFT_ASSETDIR__
-#define __HPP_GLCRAFT_ASSETDIR__
+#ifndef __HPP_GLGAME_ASSETDIR__
+#define __HPP_GLGAME_ASSETDIR__
 
 #include <cassert>
 #include <initializer_list>
@@ -7,16 +7,16 @@
 
 #include "types.hpp"
 
-namespace craft {
+namespace glgame {
 class AssetDir {
 public:
   AssetDir(std::initializer_list<std::string> paths);
 
-  craft::path GetFile(const char *filename) const;
+  glgame::path GetFile(const char *filename) const;
 
 private:
-  craft::path m_BaseDir;
+  glgame::path m_BaseDir;
 };
-} // namespace craft
+} // namespace glgame
 
-#endif /*  __HPP_GLCRAFT_ASSETDIR__ */
+#endif /*  __HPP_GLGAME_ASSETDIR__ */

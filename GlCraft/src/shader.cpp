@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <string.h>
 
-// clang-format: off
+// clang-format off
 #ifdef __EMSCRIPTEN__
 #  include <glad/egl.h>
 #  include <glad/gles2.h>
@@ -14,7 +14,7 @@
 # include <SDL2/SDL.h>
 # include <SDL2/SDL_opengl.h>
 #endif /* __EMSCRIPTEN__ */
-// clang-format: on
+// clang-format on
 
 #include <cstdio>
 #include <filesystem>
@@ -22,15 +22,15 @@
 #include <iostream>
 #include <sstream>
 
-#include "shader.hpp"
 #include "assetdir.hpp"
+#include "shader.hpp"
 #include "types.hpp"
 
-using namespace craft;
+using namespace glgame;
 
 #ifdef __EMSCRIPTEN__
 static const AssetDir SHADER_DIR{"/", "data", "shaders", "gles"};
-#else /* !__EMSCRIPTEN__ */
+#else  /* !__EMSCRIPTEN__ */
 static const AssetDir SHADER_DIR{"data", "shaders"};
 #endif /* __EMSCRIPTEN__ */
 
@@ -104,7 +104,7 @@ Shader::Shader(const std::string& vertFile, const std::string& fragFile) {
   }
   const char *vcode = vFetch.getData();
   const char *fcode = fFetch.getData();
-#else /* !__EMSCRIPTEN__ */
+#else  /* !__EMSCRIPTEN__ */
   std::string vertexCode;
   std::string fragCode;
   std::ifstream vertfs;
@@ -127,7 +127,7 @@ Shader::Shader(const std::string& vertFile, const std::string& fragFile) {
   const char *fcode = fragCode.c_str();
 #endif /* __EMSCRIPTEN__ */
 
-  craft::shader_t vert = glCreateShader(GL_VERTEX_SHADER);
+  glgame::shader_t vert = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vert, 1, &vcode, nullptr);
   glCompileShader(vert);
   // check for shader compile errors
@@ -141,7 +141,7 @@ Shader::Shader(const std::string& vertFile, const std::string& fragFile) {
                 << infoLog << std::endl;
     }
   }
-  craft::shader_t frag = glCreateShader(GL_FRAGMENT_SHADER);
+  glgame::shader_t frag = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(frag, 1, &fcode, nullptr);
   glCompileShader(frag);
   // check for shader compile errors

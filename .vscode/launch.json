@@ -18,10 +18,10 @@
       "name": "Launch Linux",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceRoot}/build/GlCraft/GlCraft",
+      "program": "${workspaceRoot}/build/GlGame/GlGame",
       "args": [],
       "stopAtEntry": false,
-      "cwd": "${workspaceRoot}/build/GlCraft/",
+      "cwd": "${workspaceRoot}/build/GlGame/",
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",
@@ -56,8 +56,8 @@
       "name": "Launch Windows",
       "type": "cppvsdbg",
       "request": "launch",
-      "program": "${workspaceRoot}/build/GlCraft/GlCraft.exe",
-      "cwd": "${workspaceRoot}/build/GlCraft/",
+      "program": "${workspaceRoot}/build/GlGame/GlGame.exe",
+      "cwd": "${workspaceRoot}/build/GlGame/",
       "externalConsole": true,
       "presentation": {
         "hidden": true

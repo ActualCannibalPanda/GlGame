@@ -1,4 +1,4 @@
-add_executable(${PROGRAM_NAME})
+add_executable(${PROJECT_NAME})
 
 if(NOT DEFINED EMSCRIPTEN)
     find_package(OpenGL REQUIRED)
@@ -6,17 +6,17 @@ endif()
 
 if ("${PLATFORM}" STREQUAL "Web")
    add_custom_command(
-       TARGET ${PROGRAM_NAME} PRE_BUILD
-       COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data $<TARGET_FILE_DIR:${PROGRAM_NAME}>/../data
+       TARGET ${PROJECT_NAME} PRE_BUILD
+       COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data $<TARGET_FILE_DIR:${PROJECT_NAME}>/../data
    )
 else ()
    add_custom_command(
-       TARGET ${PROGRAM_NAME} POST_BUILD
-       COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data $<TARGET_FILE_DIR:${PROGRAM_NAME}>/data
+       TARGET ${PROJECT_NAME} POST_BUILD
+       COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/data $<TARGET_FILE_DIR:${PROJECT_NAME}>/data
    )
 endif ()
 
-include_directories(include)
+target_include_directories(${PROJECT_NAME} PRIVATE include)
 
 
 if (DEFINED EMSCRIPTEN)
@@ -41,7 +41,7 @@ if (DEFINED EMSCRIPTEN)
     )
     file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp)
 
-    target_sources(${PROGRAM_NAME} PRIVATE ${SOURCE_FILES})
+    target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
     target_link_libraries(${PROJECT_NAME} PRIVATE ${LIB_NAME})
 
     add_custom_command(
@@ -57,14 +57,14 @@ else()
     endif()
 
     file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp)
-    set_target_properties(${PROGRAM_NAME} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROGRAM_NAME}
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PROJECT_NAME}
         CXX_STANDARD 20)
 
-    target_sources(${PROGRAM_NAME} PRIVATE src/main.cpp)
+    target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
     
-    target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm OpenGL::GL ${LIB_NAME} ${PROJECT_LIB}
+    target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm OpenGL::GL ${LIB_NAME}
         $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
         $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>)
-    target_include_directories(${PROGRAM_NAME} PRIVATE OPENGL_INCLUDE_DIR glm_INCLUDE_DIR SDL2_INCLUDE_DIR include/)
+    target_include_directories(${PROJECT_NAME} PRIVATE OPENGL_INCLUDE_DIR glm_INCLUDE_DIR SDL2_INCLUDE_DIR include/)
 endif()

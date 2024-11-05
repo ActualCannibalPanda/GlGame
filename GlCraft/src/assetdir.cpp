@@ -1,7 +1,5 @@
 #include "assetdir.hpp"
 
-#include <iostream>
-
 using namespace glgame;
 
 AssetDir::AssetDir(std::initializer_list<std::string> paths)
@@ -13,7 +11,6 @@ AssetDir::AssetDir(std::initializer_list<std::string> paths)
   for (const auto& path : paths) {
     m_BaseDir /= path;
   }
-  std::cout << m_BaseDir.string() << std::endl;
 }
 
 std::filesystem::path AssetDir::GetFile(const char *filename) const {

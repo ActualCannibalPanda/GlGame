@@ -17,7 +17,6 @@
 // clang-format on
 
 #include <cstdio>
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -92,7 +91,6 @@ Shader::Shader(const std::string& vertFile, const std::string& fragFile) {
   auto vFile = SHADER_DIR.GetFile(vertFile.c_str());
   auto fFile = SHADER_DIR.GetFile(fragFile.c_str());
 #ifdef __EMSCRIPTEN__
-  std::cout << vFile.string() << std::endl;
   std::string vname = vFile.string();
   std::string fname = fFile.string();
   Fetch vFetch(vFile.c_str());
@@ -113,7 +111,6 @@ Shader::Shader(const std::string& vertFile, const std::string& fragFile) {
   fragfs.exceptions(std::ifstream::failbit | std::ifstream::badbit);
   try {
     vertfs.open(vFile);
-    std::cout << vFile.string() << std::endl;
     fragfs.open(fFile);
     std::stringstream vertSS, fragSS;
     vertSS << vertfs.rdbuf();

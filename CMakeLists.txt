@@ -10,13 +10,13 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
 set(LIB_NAME glad)
 
+add_subdirectory(external)
+
 if (WIN32)
     # Forcing MSVC to use utf-8 encoding
     add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
     add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 endif(WIN32)
-
-add_subdirectory(external)
 
 if(NOT DEFINED EMSCRIPTEN)
     find_package(OpenGL REQUIRED)

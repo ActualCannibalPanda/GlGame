@@ -1,5 +1,6 @@
 add_subdirectory(GLAD)
 add_subdirectory(glm)
+add_subdirectory(assimp)
 
 if (NOT DEFINED EMSCRIPTEN)
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)

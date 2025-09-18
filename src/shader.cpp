@@ -162,3 +162,49 @@ Shader::Shader(const std::string& vertFile, const std::string& fragFile) {
 }
 
 void Shader::Use() const { glUseProgram(m_Program); }
+
+void Shader::Set1f(const std::string& name, float x) const {
+  glUniform1f(glGetUniformLocation(m_Program, name.c_str()), x);
+}
+void Shader::Set2f(const std::string& name, float x, float y) const {
+  glUniform2f(glGetUniformLocation(m_Program, name.c_str()), x, y);
+}
+void Shader::Set3f(const std::string& name, float x, float y, float z) const {
+
+  glUniform3f(glGetUniformLocation(m_Program, name.c_str()), x, y, z);
+}
+void Shader::Set4f(const std::string& name, float x, float y, float z,
+                   float w) const {
+  glUniform4f(glGetUniformLocation(m_Program, name.c_str()), x, y, z, w);
+}
+void Shader::Set1i(const std::string& name, int x) const {
+  glUniform1i(glGetUniformLocation(m_Program, name.c_str()), x);
+}
+void Shader::Set2i(const std::string& name, int x, int y) const {
+  glUniform2i(glGetUniformLocation(m_Program, name.c_str()), x, y);
+}
+void Shader::Set3i(const std::string& name, int x, int y, int z) const {
+
+  glUniform3f(glGetUniformLocation(m_Program, name.c_str()), x, y, z);
+}
+void Shader::Set4i(const std::string& name, int x, int y, int z, int w) const {
+  glUniform4f(glGetUniformLocation(m_Program, name.c_str()), x, y, z, w);
+}
+void Shader::SetMat4x4fv(const std::string& name, const glm::mat4x4& value,
+                         bool transpose) const {
+
+  glUniformMatrix4fv(glGetUniformLocation(m_Program, name.c_str()), 1,
+                     transpose, glm::value_ptr(value));
+}
+void Shader::Set2fv(const std::string& name, const glm::vec2& value) const {
+  glUniform2fv(glGetUniformLocation(m_Program, name.c_str()), 1,
+               glm::value_ptr(value));
+}
+void Shader::Set3fv(const std::string& name, const glm::vec3& value) const {
+  glUniform3fv(glGetUniformLocation(m_Program, name.c_str()), 1,
+               glm::value_ptr(value));
+}
+void Shader::Set4fv(const std::string& name, const glm::vec4& value) const {
+  glUniform4fv(glGetUniformLocation(m_Program, name.c_str()), 1,
+               glm::value_ptr(value));
+}

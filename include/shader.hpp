@@ -26,8 +26,8 @@ public:
   void Set2i(const std::string& name, int x, int y) const;
   void Set3i(const std::string& name, int x, int y, int z) const;
   void Set4i(const std::string& name, int x, int y, int z, int w) const;
-  void SetMat4x4fv(const std::string& name, const glm::mat4x4& value,
-                   bool transpose = false) const;
+  void SetMat4fv(const std::string& name, const glm::mat4x4& value,
+                 bool transpose = false) const;
   void Set2fv(const std::string& name, const glm::vec2& value) const;
   void Set3fv(const std::string& name, const glm::vec3& value) const;
   void Set4fv(const std::string& name, const glm::vec4& value) const;

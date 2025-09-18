@@ -190,8 +190,8 @@ void Shader::Set3i(const std::string& name, int x, int y, int z) const {
 void Shader::Set4i(const std::string& name, int x, int y, int z, int w) const {
   glUniform4f(glGetUniformLocation(m_Program, name.c_str()), x, y, z, w);
 }
-void Shader::SetMat4x4fv(const std::string& name, const glm::mat4x4& value,
-                         bool transpose) const {
+void Shader::SetMat4fv(const std::string& name, const glm::mat4x4& value,
+                       bool transpose) const {
 
   glUniformMatrix4fv(glGetUniformLocation(m_Program, name.c_str()), 1,
                      transpose, glm::value_ptr(value));

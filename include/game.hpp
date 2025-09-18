@@ -41,6 +41,7 @@ public:
   void Run();
 
 protected:
+  int m_WindowWidth, m_WindowHeight;
   SDL_Window *m_Window;
   SDL_GLContext m_Context;
 };

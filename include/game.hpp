@@ -1,5 +1,5 @@
-#ifndef __HPP_GLGAME_GAME__
-#define __HPP_GLGAME_GAME__
+#ifndef __HPP_PARADOX_GAME__
+#define __HPP_PARADOX_GAME__
 
 #include <string>
 
@@ -54,4 +54,4 @@ inline void GameRun(void *arg) {
 #endif
 } // namespace pdx
 
-#endif /*  __HPP_GLGAME_GAME__ */
+#endif /*  __HPP_PARADOX_GAME__ */

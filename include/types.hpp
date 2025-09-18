@@ -1,5 +1,5 @@
-#ifndef __HPP_GLGAME_TYPES__
-#define __HPP_GLGAME_TYPES__
+#ifndef __HPP_PARADOX_TYPES__
+#define __HPP_PARADOX_TYPES__
 
 #include <cstdint>
 
@@ -13,4 +13,4 @@ typedef uint32_t shader_t;
 typedef std::filesystem::path path;
 } // namespace pdx
 
-#endif /*  __HPP_GLGAME_TYPES__ */
+#endif /*  __HPP_PARADOX_TYPES__ */

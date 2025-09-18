@@ -1,5 +1,5 @@
-#ifndef __HPP_GLGAME_ASSETDIR__
-#define __HPP_GLGAME_ASSETDIR__
+#ifndef __HPP_PARADOX_ASSETDIR__
+#define __HPP_PARADOX_ASSETDIR__
 
 #include <cassert>
 #include <initializer_list>
@@ -19,4 +19,4 @@ private:
 };
 } // namespace pdx
 
-#endif /*  __HPP_GLGAME_ASSETDIR__ */
+#endif /*  __HPP_PARADOX_ASSETDIR__ */

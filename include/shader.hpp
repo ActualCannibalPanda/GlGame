@@ -1,5 +1,5 @@
-#ifndef __HPP_GLGAME_SHADER__
-#define __HPP_GLGAME_SHADER__
+#ifndef __HPP_PARADOX_SHADER__
+#define __HPP_PARADOX_SHADER__
 
 #include <string>
 
@@ -37,4 +37,4 @@ private:
 };
 } // namespace pdx
 
-#endif /*  __HPP_GLGAME_SHADER__ */
+#endif /*  __HPP_PARADOX_SHADER__ */

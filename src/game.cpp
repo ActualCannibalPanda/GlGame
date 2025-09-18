@@ -136,6 +136,8 @@ void Game::Run() {
   glBindVertexArray(0);
 
   AssetDir dir = AssetDir{"data", "textures"};
+  std::string file = dir.GetFile("container.jpg").string();
+  stbi_set_flip_vertically_on_load(true);
 
   unsigned int texture;
   glGenTextures(1, &texture);
@@ -144,10 +146,9 @@ void Game::Run() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  stbi_set_flip_vertically_on_load(true);
   int width, height, nrChannels;
-  unsigned char *data = stbi_load(dir.GetFile("container.jpg").c_str(), &width,
-                                  &height, &nrChannels, 0);
+  unsigned char *data =
+      stbi_load(file.c_str(), &width, &height, &nrChannels, 0);
   if (data) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
                  GL_UNSIGNED_BYTE, data);

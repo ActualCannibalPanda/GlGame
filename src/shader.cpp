@@ -25,7 +25,7 @@
 #include "shader.hpp"
 #include "types.hpp"
 
-using namespace glgame;
+using namespace pdx;
 
 #ifdef __EMSCRIPTEN__
 static const AssetDir SHADER_DIR{"/", "data", "shaders", "gles"};
@@ -124,7 +124,7 @@ Shader::Shader(const std::string& vertFile, const std::string& fragFile) {
   const char *fcode = fragCode.c_str();
 #endif /* __EMSCRIPTEN__ */
 
-  glgame::shader_t vert = glCreateShader(GL_VERTEX_SHADER);
+  pdx::shader_t vert = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vert, 1, &vcode, nullptr);
   glCompileShader(vert);
   // check for shader compile errors
@@ -138,7 +138,8 @@ Shader::Shader(const std::string& vertFile, const std::string& fragFile) {
                 << infoLog << std::endl;
     }
   }
-  glgame::shader_t frag = glCreateShader(GL_FRAGMENT_SHADER);
+  pdx::shader_t frag = glCreateShader(GL_FRAGMENT_SHADER);
+
   glShaderSource(frag, 1, &fcode, nullptr);
   glCompileShader(frag);
   // check for shader compile errors

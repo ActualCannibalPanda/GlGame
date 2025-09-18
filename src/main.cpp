@@ -6,7 +6,7 @@ constexpr int SCREEN_WIDTH = 800;
 constexpr int SCREEN_HEIGHT = 600;
 
 int main(int argc, char **argv) {
-  glgame::Game game("GlGame", SCREEN_WIDTH, SCREEN_HEIGHT);
+  pdx::Game game("Paradox", SCREEN_WIDTH, SCREEN_HEIGHT);
 
 #ifdef __EMSCRIPTEN__
   int fps = 0;

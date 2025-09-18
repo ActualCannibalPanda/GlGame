@@ -11,7 +11,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <external/stb_image.h>
-using namespace glgame;
+using namespace pdx;
 
 // clang-format off
 static float vertices[] = {
@@ -117,13 +117,13 @@ Game::Game(const std::string& title, int screenWidth, int screenHeight) {
 }
 
 void Game::Run() {
-  glgame::Shader shader("simple.vert", "simple.frag");
+  pdx::Shader shader("simple.vert", "simple.frag");
 
-  glgame::vao_t VAO;
+  pdx::vao_t VAO;
   glGenVertexArrays(1, &VAO);
   glBindVertexArray(VAO);
 
-  glgame::vbo_t VBO;
+  pdx::vbo_t VBO;
   glGenBuffers(1, &VBO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);

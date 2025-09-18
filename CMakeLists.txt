@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
-project(GlGame)
+project(Paradox)
 add_executable(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PUBLIC "{CMAKE_SOURCE_DIR}/include")
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)

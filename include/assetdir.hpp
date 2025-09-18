@@ -7,16 +7,16 @@
 
 #include "types.hpp"
 
-namespace glgame {
+namespace pdx {
 class AssetDir {
 public:
   AssetDir(std::initializer_list<std::string> paths);
 
-  glgame::path GetFile(const char *filename) const;
+  pdx::path GetFile(const char *filename) const;
 
 private:
-  glgame::path m_BaseDir;
+  pdx::path m_BaseDir;
 };
-} // namespace glgame
+} // namespace pdx
 
 #endif /*  __HPP_GLGAME_ASSETDIR__ */

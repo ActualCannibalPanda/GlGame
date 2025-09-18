@@ -33,7 +33,7 @@
 #endif /* __EMSCRIPTEN__ */
 // clang-format on
 
-namespace glgame {
+namespace pdx {
 class Game {
 public:
   Game();
@@ -52,6 +52,6 @@ inline void GameRun(void *arg) {
   static_cast<Game *>(arg)->Run();
 }
 #endif
-} // namespace glgame
+} // namespace pdx
 
 #endif /*  __HPP_GLGAME_GAME__ */

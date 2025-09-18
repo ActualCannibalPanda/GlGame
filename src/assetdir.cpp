@@ -1,6 +1,6 @@
 #include "assetdir.hpp"
 
-using namespace glgame;
+using namespace pdx;
 
 AssetDir::AssetDir(std::initializer_list<std::string> paths)
 #ifdef __EMSCRIPTEN__

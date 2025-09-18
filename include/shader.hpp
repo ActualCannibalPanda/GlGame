@@ -9,7 +9,7 @@
 
 #include "types.hpp"
 
-namespace glgame {
+namespace pdx {
 class Shader {
 public:
   Shader(const std::string& vertFile, const std::string& fragFile);
@@ -33,8 +33,8 @@ public:
   void Set4fv(const std::string& name, const glm::vec4& value) const;
 
 private:
-  glgame::program_t m_Program;
+  pdx::program_t m_Program;
 };
-} // namespace glgame
+} // namespace pdx
 
 #endif /*  __HPP_GLGAME_SHADER__ */

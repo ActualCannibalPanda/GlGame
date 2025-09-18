@@ -14,6 +14,8 @@ class Shader {
 public:
   Shader(const std::string& vertFile, const std::string& fragFile);
 
+  static void Unbind() { glUseProgram(0); }
+
   void Use() const;
 
   void Set1f(const std::string& name, float x) const;

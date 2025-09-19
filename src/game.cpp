@@ -101,6 +101,7 @@ Game::Game(const std::string& title, int screenWidth, int screenHeight) {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+  SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
 #else  /* __EMSCRIPTEN__*/
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
@@ -242,12 +243,12 @@ void Game::Run() {
         100.0f);
 
     // draw "portal" from regular viewspace
-    simpleShader.Use();
+    singleColorShader.Use();
     {
       glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 1.0f));
-      simpleShader.SetMat4fv("model", model);
-      simpleShader.SetMat4fv("view", view);
-      simpleShader.SetMat4fv("projection", projection);
+      singleColorShader.SetMat4fv("model", model);
+      singleColorShader.SetMat4fv("view", view);
+      singleColorShader.SetMat4fv("projection", projection);
       glBindVertexArray(VAOPortal);
       glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     }
@@ -289,12 +290,12 @@ void Game::Run() {
     glClear(GL_DEPTH_BUFFER_BIT);
 
     // draw "portal" to depth buffer so it doesn't get overridden
-    simpleShader.Use();
+    singleColorShader.Use();
     {
       glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 1.0f));
-      simpleShader.SetMat4fv("model", model);
-      simpleShader.SetMat4fv("view", view);
-      simpleShader.SetMat4fv("projection", projection);
+      singleColorShader.SetMat4fv("model", model);
+      singleColorShader.SetMat4fv("view", view);
+      singleColorShader.SetMat4fv("projection", projection);
       glBindVertexArray(VAOPortal);
     }
 

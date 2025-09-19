@@ -1,2 +1,5 @@
 *.jpg filter=lfs diff=lfs merge=lfs -binary
 *.png filter=lfs diff=lfs merge=lfs -binary
+*.bin filter=lfs diff=lfs merge=lfs -binary
+*.jpeg filter=lfs diff=lfs merge=lfs -binary
+*.gltf filter=lfs diff=lfs merge=lfs -text

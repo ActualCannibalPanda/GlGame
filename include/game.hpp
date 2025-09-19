@@ -26,10 +26,6 @@
     bool running = true;                                                         \
     do
 # define MAIN_LOOP_END while(running)
-# define CHECK_SHOULD_QUIT                                                      \
-    case SDL_QUIT:                                                               \
-      running = false;                                                           \
-      break
 #endif /* __EMSCRIPTEN__ */
 // clang-format on
 

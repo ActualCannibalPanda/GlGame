@@ -35,6 +35,10 @@ glm::mat4 Camera::GetViewMatrix() const {
   return glm::lookAt(m_Position, m_Position + m_Front, m_Up);
 }
 
+glm::mat4 Camera::GetViewFromCamera(const Camera& other) const {
+  return glm::lookAt(m_Position, m_Position + other.m_Front, m_Up);
+}
+
 void Camera::UpdateCameraVectors() {
   glm::vec3 front;
   front.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));

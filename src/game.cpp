@@ -1,5 +1,6 @@
 #include "game.hpp"
 
+#include <SDL_events.h>
 #include <SDL_mouse.h>
 #include <SDL_timer.h>
 #include <SDL_video.h>
@@ -8,7 +9,6 @@
 
 #include <iostream>
 
-#include "SDL_events.h"
 #include "assetdir.hpp"
 #include "camera.hpp"
 #include "shader.hpp"
@@ -21,7 +21,7 @@
 using namespace pdx;
 
 // clang-format off
-static float vertices[] = {
+static float cubeVertices[] = {
     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
      0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -77,6 +77,17 @@ glm::vec3 cubePositions[] = {
     glm::vec3( 1.5f,  0.2f, -1.5f), 
     glm::vec3(-1.3f,  1.0f, -1.5f)  
 };
+
+float planeVertices[] = {
+   0.5f,  0.5f, 0.0f,  // top right
+   0.5f, -0.5f, 0.0f,  // bottom right
+  -0.5f, -0.5f, 0.0f,  // bottom left
+  -0.5f,  0.5f, 0.0f   // top left
+};
+unsigned int planeIndices[] = {  // note that we start from 0!
+  0, 1, 3,  // first Triangle
+  1, 2, 3   // second Triangle
+};
 // clang-format on
 
 Game::Game() : Game("Game", 800, 600) {}
@@ -125,21 +136,44 @@ Game::Game(const std::string& title, int screenWidth, int screenHeight) {
 }
 
 void Game::Run() {
-  pdx::Shader shader("simple.vert", "simple.frag");
+  pdx::Shader simpleShader("simple.vert", "simple.frag");
+  pdx::Shader singleColorShader("singleColor.vert", "singleColor.frag");
 
-  pdx::vao_t VAO;
-  glGenVertexArrays(1, &VAO);
-  glBindVertexArray(VAO);
+  pdx::vao_t VAOCube;
+  glGenVertexArrays(1, &VAOCube);
+  glBindVertexArray(VAOCube);
 
-  pdx::vbo_t VBO;
-  glGenBuffers(1, &VBO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+  pdx::vbo_t VBOCube;
+  glGenBuffers(1, &VBOCube);
+  glBindBuffer(GL_ARRAY_BUFFER, VBOCube);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices,
+               GL_STATIC_DRAW);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                         (void *)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
+
+  pdx::vao_t VAOPortal;
+  pdx::vbo_t VBOPortal;
+  pdx::ebo_t EBOPortal;
+  glGenVertexArrays(1, &VAOPortal);
+  glGenBuffers(1, &VBOPortal);
+  glGenBuffers(1, &EBOPortal);
+  glBindVertexArray(VAOPortal);
+
+  glBindBuffer(GL_ARRAY_BUFFER, VBOPortal);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices,
+               GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOPortal);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(planeIndices), planeIndices,
+               GL_STATIC_DRAW);
+
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+  glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
 
@@ -166,7 +200,8 @@ void Game::Run() {
 
   glEnable(GL_DEPTH_TEST);
 
-  Camera camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  Camera camera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  Camera virtCam(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
   int now = SDL_GetPerformanceCounter();
   int last = 0;
@@ -183,21 +218,55 @@ void Game::Run() {
     delta = (double)(now - last) / (double)SDL_GetPerformanceFrequency();
 
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearStencil(0);
+    glStencilMask(0xFF);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    shader.Use();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    // disable depth and color masks
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    glDepthMask(GL_FALSE);
+    // disable depth test
+    glDisable(GL_DEPTH_TEST);
+    // enable stencil test
+    glEnable(GL_STENCIL_TEST);
+    // always fail
+    glStencilFunc(GL_NEVER, 1, 0xFF);
+    // replace passing tests with 1
+    glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
+    glStencilMask(0xFF);
+    glClear(GL_STENCIL_BUFFER_BIT);
 
     glm::mat4 view = camera.GetViewMatrix();
     glm::mat4 projection = glm::perspective(
         glm::radians(45.0f), (float)m_WindowWidth / (float)m_WindowHeight, 0.1f,
         100.0f);
 
-    shader.SetMat4fv("view", view);
-    shader.SetMat4fv("projection", projection);
+    // draw "portal" from regular viewspace
+    simpleShader.Use();
+    {
+      glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 1.0f));
+      simpleShader.SetMat4fv("model", model);
+      simpleShader.SetMat4fv("view", view);
+      simpleShader.SetMat4fv("projection", projection);
+      glBindVertexArray(VAOPortal);
+      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    }
 
-    glBindVertexArray(VAO);
+    // renenable color and depth mask
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glDepthMask(GL_TRUE);
+    glEnable(GL_DEPTH_TEST);
+    glStencilMask(0x00);
+    glStencilFunc(GL_EQUAL, 1, 0xFF);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    // draw scene from pov of other camera
+    simpleShader.Use();
+    simpleShader.SetMat4fv("view", virtCam.GetViewFromCamera(camera));
+    simpleShader.SetMat4fv("projection", projection);
+
+    glBindVertexArray(VAOCube);
     for (unsigned int i = 0; i < 10; ++i) {
       glm::mat4 model = glm::mat4(1.0f);
       model = glm::translate(model, cubePositions[i]);
@@ -208,10 +277,28 @@ void Game::Run() {
         model = glm::rotate(model, glm::radians(20.0f * i),
                             glm::vec3(1.0f, 0.3f, 0.5f));
       }
-      shader.SetMat4fv("model", model);
-      glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices) / sizeof(float) / 5);
+      simpleShader.SetMat4fv("model", model);
+      glDrawArrays(GL_TRIANGLES, 0, sizeof(cubeVertices) / sizeof(float) / 5);
     }
-    Shader::Unbind();
+
+    // clear depth buffer
+    glDisable(GL_STENCIL_TEST);
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    glDepthMask(GL_TRUE);
+    glEnable(GL_DEPTH_TEST);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    // draw "portal" to depth buffer so it doesn't get overridden
+    simpleShader.Use();
+    {
+      glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 1.0f));
+      simpleShader.SetMat4fv("model", model);
+      simpleShader.SetMat4fv("view", view);
+      simpleShader.SetMat4fv("projection", projection);
+      glBindVertexArray(VAOPortal);
+    }
+
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {

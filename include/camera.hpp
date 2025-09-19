@@ -13,6 +13,7 @@ public:
   void Look(float dx, float dy, float delta);
 
   glm::mat4 GetViewMatrix() const;
+  glm::mat4 GetViewFromCamera(const Camera& other) const;
 
 private:
   void UpdateCameraVectors();

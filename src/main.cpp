@@ -1,6 +1,4 @@
 #include "game.hpp"
-#include "shader.hpp"
-#include "types.hpp"
 
 constexpr int SCREEN_WIDTH = 800;
 constexpr int SCREEN_HEIGHT = 600;

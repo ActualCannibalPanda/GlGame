@@ -159,7 +159,7 @@ Shader::Shader(const std::string& vertFile, const std::string& fragFile) {
   glAttachShader(m_Program, frag);
   glLinkProgram(m_Program);
   glDeleteShader(vert);
-  glDeleteProgram(frag);
+  glDeleteShader(frag);
 }
 
 void Shader::Use() const { glUseProgram(m_Program); }

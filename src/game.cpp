@@ -176,64 +176,7 @@ void Game::Run() {
   pdx::Shader simpleShader("simple.vert", "simple.frag");
   pdx::Shader singleColorShader("singleColor.vert", "singleColor.frag");
   pdx::Shader lightShader("light.vert", "light.frag");
-  /*
-    pdx::vao_t VAOCube;
-    glGenVertexArrays(1, &VAOCube);
-    glBindVertexArray(VAOCube);
 
-    pdx::vbo_t VBOCube;
-    glGenBuffers(1, &VBOCube);
-    glBindBuffer(GL_ARRAY_BUFFER, VBOCube);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices,
-                 GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void
-    *)0); glEnableVertexAttribArray(0); glVertexAttribPointer(1, 2, GL_FLOAT,
-    GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-    pdx::vao_t VAOPortal;
-    pdx::vbo_t VBOPortal;
-    pdx::ebo_t EBOPortal;
-    glGenVertexArrays(1, &VAOPortal);
-    glGenBuffers(1, &VBOPortal);
-    glGenBuffers(1, &EBOPortal);
-    glBindVertexArray(VAOPortal);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBOPortal);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices,
-                 GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBOPortal);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(planeIndices), planeIndices,
-                 GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void
-    *)0); glEnableVertexAttribArray(0); glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-    AssetDir dir = AssetDir{"data", "textures"};
-    std::string file = dir.GetFile("container.jpg").string();
-    stbi_set_flip_vertically_on_load(true);
-
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    int width, height, nrChannels;
-    unsigned char *data =
-        stbi_load(file.c_str(), &width, &height, &nrChannels, 0);
-    if (data) {
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB,
-                   GL_UNSIGNED_BYTE, data);
-      glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    stbi_image_free(data);
-  */
   glEnable(GL_DEPTH_TEST);
 
   Camera camera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -332,7 +275,9 @@ void Game::Run() {
     // draw "portal" to depth buffer so it doesn't get overridden
     singleColorShader.Use();
     {
-      glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 1.0f));
+      glm::mat4 model = glm::scale(
+          glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(1.0f, 0.0f, 0.0f)),
+          glm::vec3(1.0f, 1.0f, 1.0f));
       singleColorShader.SetMat4fv("model", model);
       singleColorShader.SetMat4fv("view", view);
       singleColorShader.SetMat4fv("projection", projection);

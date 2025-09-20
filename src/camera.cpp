@@ -31,6 +31,10 @@ void Camera::Look(float dx, float dy, float delta) {
   UpdateCameraVectors();
 }
 
+glm::vec3 Camera::Front() const { return m_Front; }
+
+glm::vec3 Camera::Position() const { return m_Position; }
+
 glm::mat4 Camera::GetViewMatrix() const {
   return glm::lookAt(m_Position, m_Position + m_Front, m_Up);
 }

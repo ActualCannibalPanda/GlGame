@@ -12,6 +12,8 @@ public:
   void Move(const glm::vec3& direction, float delta);
   void Look(float dx, float dy, float delta);
 
+  glm::vec3 Front() const;
+  glm::vec3 Position() const;
   glm::mat4 GetViewMatrix() const;
   glm::mat4 GetViewFromCamera(const Camera& other) const;
 

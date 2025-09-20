@@ -20,50 +20,6 @@
 using namespace pdx;
 
 // clang-format off
-static float cubeVertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-};
-
 glm::vec3 cubePositions[] = {
     glm::vec3( 0.0f,  0.0f,  0.0f), 
     glm::vec3( 2.0f,  5.0f, -15.0f), 
@@ -76,18 +32,88 @@ glm::vec3 cubePositions[] = {
     glm::vec3( 1.5f,  0.2f, -1.5f), 
     glm::vec3(-1.3f,  1.0f, -1.5f)  
 };
-
-float planeVertices[] = {
-   0.5f,  0.5f, 0.0f,  // top right
-   0.5f, -0.5f, 0.0f,  // bottom right
-  -0.5f, -0.5f, 0.0f,  // bottom left
-  -0.5f,  0.5f, 0.0f   // top left
-};
-unsigned int planeIndices[] = {  // note that we start from 0!
-  0, 1, 3,  // first Triangle
-  1, 2, 3   // second Triangle
-};
 // clang-format on
+
+void GLAPIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id,
+                              GLenum severity, GLsizei length,
+                              const char *message, const void *userParam) {
+  // ignore non-significant error/warning codes
+  if (id == 131169 || id == 131185 || id == 131218 || id == 131204)
+    return;
+
+  std::cout << "---------------" << std::endl;
+  std::cout << "Debug message (" << id << "): " << message << std::endl;
+
+  switch (source) {
+  case GL_DEBUG_SOURCE_API:
+    std::cout << "Source: API";
+    break;
+  case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
+    std::cout << "Source: Window System";
+    break;
+  case GL_DEBUG_SOURCE_SHADER_COMPILER:
+    std::cout << "Source: Shader Compiler";
+    break;
+  case GL_DEBUG_SOURCE_THIRD_PARTY:
+    std::cout << "Source: Third Party";
+    break;
+  case GL_DEBUG_SOURCE_APPLICATION:
+    std::cout << "Source: Application";
+    break;
+  case GL_DEBUG_SOURCE_OTHER:
+    std::cout << "Source: Other";
+    break;
+  }
+  std::cout << std::endl;
+
+  switch (type) {
+  case GL_DEBUG_TYPE_ERROR:
+    std::cout << "Type: Error";
+    break;
+  case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+    std::cout << "Type: Deprecated Behaviour";
+    break;
+  case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+    std::cout << "Type: Undefined Behaviour";
+    break;
+  case GL_DEBUG_TYPE_PORTABILITY:
+    std::cout << "Type: Portability";
+    break;
+  case GL_DEBUG_TYPE_PERFORMANCE:
+    std::cout << "Type: Performance";
+    break;
+  case GL_DEBUG_TYPE_MARKER:
+    std::cout << "Type: Marker";
+    break;
+  case GL_DEBUG_TYPE_PUSH_GROUP:
+    std::cout << "Type: Push Group";
+    break;
+  case GL_DEBUG_TYPE_POP_GROUP:
+    std::cout << "Type: Pop Group";
+    break;
+  case GL_DEBUG_TYPE_OTHER:
+    std::cout << "Type: Other";
+    break;
+  }
+  std::cout << std::endl;
+
+  switch (severity) {
+  case GL_DEBUG_SEVERITY_HIGH:
+    std::cout << "Severity: high";
+    break;
+  case GL_DEBUG_SEVERITY_MEDIUM:
+    std::cout << "Severity: medium";
+    break;
+  case GL_DEBUG_SEVERITY_LOW:
+    std::cout << "Severity: low";
+    break;
+  case GL_DEBUG_SEVERITY_NOTIFICATION:
+    std::cout << "Severity: notification";
+    break;
+  }
+  std::cout << std::endl;
+  std::cout << std::endl;
+}
 
 Game::Game() : Game("Game", 800, 600) {}
 
@@ -97,10 +123,11 @@ Game::Game(const std::string& title, int screenWidth, int screenHeight) {
   }
 #ifndef __EMSCRIPTEN__
   SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
 #else  /* __EMSCRIPTEN__*/
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
@@ -133,6 +160,16 @@ Game::Game(const std::string& title, int screenWidth, int screenHeight) {
 
   glViewport(0, 0, screenWidth, screenHeight);
   glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+
+  int flags;
+  glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+  if (flags & GL_CONTEXT_FLAG_DEBUG_BIT) {
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(glDebugOutput, nullptr);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
+                          GL_TRUE);
+  }
 }
 
 void Game::Run() {
@@ -202,9 +239,12 @@ void Game::Run() {
   Camera camera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
   Camera virtCam(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-  pdx::AssetDir assetDir{"data"};
-  pdx::Model assetModel =
-      pdx::Model::FromGLTF(assetDir.GetFile("scene.gltf")).value();
+  pdx::AssetDir cubeDir{"data", "models", "cube"};
+  pdx::Model cube = pdx::Model::FromGLTF(cubeDir.GetFile("scene.gltf")).value();
+
+  pdx::AssetDir portalDir{"data", "models", "portal"};
+  pdx::Model portal =
+      pdx::Model::FromGLTF(portalDir.GetFile("scene.gltf")).value();
 
   int now = SDL_GetPerformanceCounter();
   int last = 0;
@@ -220,22 +260,6 @@ void Game::Run() {
 
     delta = (double)(now - last) / (double)SDL_GetPerformanceFrequency();
 
-    glEnable(GL_DEPTH_TEST);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glm::mat4 model(1.0f);
-    glm::mat4 view = camera.GetViewMatrix();
-    glm::mat4 projection = glm::perspective(
-        glm::radians(45.0f), (float)m_WindowWidth / (float)m_WindowHeight, 0.1f,
-        100.0f);
-
-    lightShader.Use();
-    glm::mat4 mvp = projection * view * model;
-    lightShader.SetMat4fv("MVP", mvp);
-
-    assetModel.Draw();
-
-    /*
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClearStencil(0);
     glStencilMask(0xFF);
@@ -263,12 +287,13 @@ void Game::Run() {
     // draw "portal" from regular viewspace
     singleColorShader.Use();
     {
-      glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 1.0f));
+      glm::mat4 model = glm::scale(
+          glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(1.0f, 0.0f, 0.0f)),
+          glm::vec3(1.0f, 1.0f, 1.0f));
       singleColorShader.SetMat4fv("model", model);
       singleColorShader.SetMat4fv("view", view);
       singleColorShader.SetMat4fv("projection", projection);
-      glBindVertexArray(VAOPortal);
-      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+      portal.Draw();
     }
 
     // renenable color and depth mask
@@ -277,15 +302,12 @@ void Game::Run() {
     glEnable(GL_DEPTH_TEST);
     glStencilMask(0x00);
     glStencilFunc(GL_EQUAL, 1, 0xFF);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
 
     // draw scene from pov of other camera
     simpleShader.Use();
     simpleShader.SetMat4fv("view", virtCam.GetViewFromCamera(camera));
     simpleShader.SetMat4fv("projection", projection);
 
-    glBindVertexArray(VAOCube);
     for (unsigned int i = 0; i < 10; ++i) {
       glm::mat4 model = glm::mat4(1.0f);
       model = glm::translate(model, cubePositions[i]);
@@ -297,7 +319,7 @@ void Game::Run() {
                             glm::vec3(1.0f, 0.3f, 0.5f));
       }
       simpleShader.SetMat4fv("model", model);
-      glDrawArrays(GL_TRIANGLES, 0, sizeof(cubeVertices) / sizeof(float) / 5);
+      cube.Draw();
     }
 
     // clear depth buffer
@@ -314,11 +336,11 @@ void Game::Run() {
       singleColorShader.SetMat4fv("model", model);
       singleColorShader.SetMat4fv("view", view);
       singleColorShader.SetMat4fv("projection", projection);
-      glBindVertexArray(VAOPortal);
+      portal.Draw();
     }
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    */
+
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       switch (event.type) {

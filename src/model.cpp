@@ -104,7 +104,6 @@ static void BindMesh(std::map<int, GLuint>& vbos,
     glGenBuffers(1, &vbo);
     vbos[i] = vbo;
     glBindBuffer(bufferView.target, vbo);
-    std::cout << buffer.data.size() << std::endl;
 
     glBufferData(bufferView.target, bufferView.byteLength,
                  &buffer.data.at(0) + bufferView.byteOffset, GL_STATIC_DRAW);
@@ -137,6 +136,9 @@ static void BindMesh(std::map<int, GLuint>& vbos,
       }
       if (attrib.first.compare("TEXCOORD_0") == 0) {
         vaa = 3;
+      }
+      if (attrib.first.compare("TEXCOORD_1") == 0) {
+        vaa = 4;
       }
 
       if (vaa > -1) {

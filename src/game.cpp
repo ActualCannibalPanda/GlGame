@@ -189,6 +189,10 @@ void Game::Run() {
   pdx::Model portal =
       pdx::Model::FromGLTF(portalDir.GetFile("scene.gltf")).value();
 
+  pdx::AssetDir portalFrameDir{"data", "models", "portalFrame"};
+  pdx::Model portalFrame =
+      pdx::Model::FromGLTF(portalFrameDir.GetFile("scene.gltf")).value();
+
   int now = SDL_GetPerformanceCounter();
   int last = 0;
   double delta;
@@ -203,8 +207,12 @@ void Game::Run() {
 
     delta = (double)(now - last) / (double)SDL_GetPerformanceFrequency();
 
+    glm::mat4 view = camera.GetViewMatrix();
+    glm::mat4 projection = glm::perspective(
+        glm::radians(45.0f), (float)m_WindowWidth / (float)m_WindowHeight, 0.1f,
+        100.0f);
+
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClearStencil(0);
     glStencilMask(0xFF);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -218,14 +226,9 @@ void Game::Run() {
     // always fail
     glStencilFunc(GL_NEVER, 1, 0xFF);
     // replace passing tests with 1
-    glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
+    glStencilOp(GL_INCR, GL_KEEP, GL_KEEP);
     glStencilMask(0xFF);
     glClear(GL_STENCIL_BUFFER_BIT);
-
-    glm::mat4 view = camera.GetViewMatrix();
-    glm::mat4 projection = glm::perspective(
-        glm::radians(45.0f), (float)m_WindowWidth / (float)m_WindowHeight, 0.1f,
-        100.0f);
 
     // draw "portal" from regular viewspace
     singleColorShader.Use();
@@ -245,6 +248,7 @@ void Game::Run() {
     glEnable(GL_DEPTH_TEST);
     glStencilMask(0x00);
     glStencilFunc(GL_EQUAL, 1, 0xFF);
+    glStencilOp(GL_DECR, GL_KEEP, GL_KEEP);
 
     // draw scene from pov of other camera
     simpleShader.Use();
@@ -267,9 +271,12 @@ void Game::Run() {
 
     // clear depth buffer
     glDisable(GL_STENCIL_TEST);
+    glStencilMask(0x00);
+
     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-    glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_ALWAYS);
     glClear(GL_DEPTH_BUFFER_BIT);
 
     // draw "portal" to depth buffer so it doesn't get overridden
@@ -284,7 +291,27 @@ void Game::Run() {
       portal.Draw();
     }
 
+    glDepthFunc(GL_LESS);
+    glEnable(GL_STENCIL_TEST);
+    glStencilMask(0x00);
+
+    glStencilFunc(GL_LEQUAL, 0, 0xFF);
+
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glDepthMask(GL_TRUE);
+
+    glEnable(GL_DEPTH_TEST);
+
+    singleColorShader.Use();
+    {
+      glm::mat4 model = glm::scale(
+          glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(1.0f, 0.0f, 0.0f)),
+          glm::vec3(0.5f, 0.5f, 0.5f));
+      singleColorShader.SetMat4fv("model", model);
+      singleColorShader.SetMat4fv("view", view);
+      singleColorShader.SetMat4fv("projection", projection);
+      portalFrame.Draw();
+    }
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {

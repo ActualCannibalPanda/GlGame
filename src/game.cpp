@@ -122,17 +122,12 @@ Game::Game(const std::string& title, int screenWidth, int screenHeight) {
   if (SDL_Init(SDL_INIT_VIDEO) < 0) {
     std::cout << "Failed to start SDL: " << SDL_GetError() << std::endl;
   }
-#ifndef __EMSCRIPTEN__
   SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
-#else  /* __EMSCRIPTEN__*/
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#endif /* !__EMSCRIPTEN__ */
 
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
@@ -145,13 +140,9 @@ Game::Game(const std::string& title, int screenWidth, int screenHeight) {
   }
   m_Context = SDL_GL_CreateContext(m_Window);
 
-#ifndef __EMSCRIPTEN__
   if (!gladLoaderLoadGL()) {
     std::cout << "Failed to initialize GLAD" << std::endl;
   }
-#else  /* __EMSCRIPTEN__ */
-  gladLoaderLoadGLES2();
-#endif /* !__EMSCRIPTEN__ */
 
   SDL_SetRelativeMouseMode(SDL_TRUE);
   SDL_GL_SetSwapInterval(1);
@@ -204,7 +195,8 @@ void Game::Run() {
 
   glm::vec3 portalNormal(0.0f, 0.0f, 1.0f);
 
-  MAIN_LOOP_BEGIN {
+  bool running = true;
+  do {
     last = now;
     now = SDL_GetPerformanceCounter();
 
@@ -384,6 +376,5 @@ void Game::Run() {
     }
     camera.Move(moveDirection, delta);
     SDL_GL_SwapWindow(m_Window);
-  }
-  MAIN_LOOP_END;
+  } while (running);
 }

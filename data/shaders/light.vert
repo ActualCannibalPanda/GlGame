@@ -11,11 +11,11 @@ out vec3 position;
 out vec2 texcoord0;
 out vec2 texcoord1;
 
-void main(){
-	gl_Position = MVP * vec4(in_vertex, 1.0);
-	position = gl_Position.xyz;
-	normal = normalize(mat3(MVP) * in_normal);
-	position = in_vertex;
-	texcoord0 = in_texcoord0;
-	texcoord1 = in_texcoord1;
+void main() {
+    gl_Position = MVP * vec4(in_vertex, 1.0);
+    position = gl_Position.xyz;
+    normal = normalize(mat3(MVP) * in_normal);
+    position = in_vertex;
+    texcoord0 = in_texcoord0;
+    texcoord1 = in_texcoord1;
 }

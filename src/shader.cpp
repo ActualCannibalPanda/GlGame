@@ -1,20 +1,10 @@
 #include <cstdio>
 #include <string.h>
 
-// clang-format off
-#ifdef __EMSCRIPTEN__
-#  include <glad/egl.h>
-#  include <glad/gles2.h>
+#include <glad/gl.h>
 
-#  include <emscripten.h>
-#  include <emscripten/fetch.h>
-#else /* !__EMSCRIPTEN__ */
-# include <glad/gl.h>
-
-# include <SDL2/SDL.h>
-# include <SDL2/SDL_opengl.h>
-#endif /* __EMSCRIPTEN__ */
-// clang-format on
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
 
 #include <cstdio>
 #include <fstream>
@@ -27,82 +17,11 @@
 
 using namespace pdx;
 
-#ifdef __EMSCRIPTEN__
-static const AssetDir SHADER_DIR{"/", "data", "shaders", "gles"};
-#else  /* !__EMSCRIPTEN__ */
 static const AssetDir SHADER_DIR{"data", "shaders"};
-#endif /* __EMSCRIPTEN__ */
-
-#ifdef __EMSCRIPTEN__
-void onSuccess(emscripten_fetch_t *fetch);
-void onError(emscripten_fetch_t *fetch);
-
-class Fetch {
-public:
-  Fetch(const std::string& thing) : m_Thing(thing) {}
-
-  void sendRequest() const {
-    emscripten_fetch_attr_t attr;
-    emscripten_fetch_attr_init(&attr);
-    strcpy(attr.requestMethod, "GET");
-    attr.attributes =
-        EMSCRIPTEN_FETCH_LOAD_TO_MEMORY | EMSCRIPTEN_FETCH_PERSIST_FILE;
-    attr.onsuccess = onSuccess;
-    attr.onerror = onError;
-    attr.userData = static_cast<void *>(const_cast<Fetch *>(this));
-    emscripten_fetch(&attr, m_Thing.c_str());
-  }
-
-  void __set_job_done(bool success, const char *data) {
-    m_Success = success;
-    m_JobDone = true;
-    if (success) {
-      size_t len = strlen(data);
-      m_Data = new char[len];
-      strcpy(m_Data, data);
-    }
-  }
-
-  bool isDone() const { return m_JobDone; }
-  bool isValid() const { return m_Success; }
-
-  const char *getData() { return m_Data; }
-
-private:
-  volatile bool m_JobDone = false;
-  bool m_Success = false;
-  char *m_Data = nullptr;
-  std::string m_Thing;
-};
-
-void onSuccess(emscripten_fetch_t *fetch) {
-  Fetch *f = static_cast<Fetch *>(fetch->userData);
-  f->__set_job_done(true, fetch->data);
-  emscripten_fetch_close(fetch);
-}
-void onError(emscripten_fetch_t *fetch) {
-  Fetch *f = static_cast<Fetch *>(fetch->userData);
-  f->__set_job_done(false, nullptr);
-  emscripten_fetch_close(fetch);
-}
-#endif /* __EMSCRIPTEN__ */
 
 Shader::Shader(const std::string& vertFile, const std::string& fragFile) {
   auto vFile = SHADER_DIR.GetFile(vertFile.c_str());
   auto fFile = SHADER_DIR.GetFile(fragFile.c_str());
-#ifdef __EMSCRIPTEN__
-  std::string vname = vFile.string();
-  std::string fname = fFile.string();
-  Fetch vFetch(vFile.c_str());
-  Fetch fFetch(fFile.c_str());
-  vFetch.sendRequest();
-  fFetch.sendRequest();
-  while (!fFetch.isDone() || !vFetch.isDone()) {
-    emscripten_sleep(100);
-  }
-  const char *vcode = vFetch.getData();
-  const char *fcode = fFetch.getData();
-#else  /* !__EMSCRIPTEN__ */
   std::string vertexCode;
   std::string fragCode;
   std::ifstream vertfs;
@@ -122,7 +41,6 @@ Shader::Shader(const std::string& vertFile, const std::string& fragFile) {
   }
   const char *vcode = vertexCode.c_str();
   const char *fcode = fragCode.c_str();
-#endif /* __EMSCRIPTEN__ */
 
   pdx::shader_t vert = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vert, 1, &vcode, nullptr);

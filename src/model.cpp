@@ -18,48 +18,6 @@
 
 using namespace pdx;
 
-// Model::Model(const pdx::path& path) {
-// Assimp::Importer importer;
-//
-// const aiScene *scene = importer.ReadFile(
-//     path.string(), aiProcess_CalcTangentSpace | aiProcess_Triangulate |
-//                        aiProcess_JoinIdenticalVertices |
-//                        aiProcess_SortByPType | aiProcess_GenNormals);
-//
-// if (scene == nullptr) {
-//   std::cerr << "Failed to load " << path.string() << std::endl;
-//   return;
-// }
-//
-// std::vector<float> data;
-// aiNode *root = scene->mRootNode;
-// for (unsigned int meshIdx = 0; meshIdx < root->mNumMeshes; ++meshIdx) {
-//   aiMesh *mesh = scene->mMeshes[root->mMeshes[meshIdx]];
-//   for (unsigned int vertIdx = 0; vertIdx < mesh->mNumVertices; ++vertIdx) {
-//     aiVector3D vec = mesh->mVertices[vertIdx];
-//     data.push_back(vec.x);
-//     data.push_back(vec.y);
-//     data.push_back(vec.z);
-//     if (mesh->HasNormals()) {
-//       aiVector3D normal = mesh->mNormals[vertIdx];
-//       data.push_back(normal.x);
-//       data.push_back(normal.y);
-//       data.push_back(normal.z);
-//     }
-//     for (unsigned int texCoordIdx = 0; texCoordIdx < 8; ++texCoordIdx) {
-//       if (mesh->HasTextureCoords(texCoordIdx)) {
-//         aiVector3D texCoord = mesh->mTextureCoords[texCoordIdx][vertIdx];
-//         data.push_back(texCoord.x);
-//         data.push_back(texCoord.y);
-//       } else {
-//         break;
-//       }
-//     }
-//   }
-// }
-//   std::cout << data.size() << std::endl;
-// }
-
 Model::Model(tinygltf::Model& model, pdx::vao_t vao, std::map<int, GLuint> ebos,
              std::map<int, GLuint> textures)
     : m_Model(model), m_Vao(vao), m_Ebos(ebos), m_Textures(textures) {}

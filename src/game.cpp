@@ -6,6 +6,7 @@
 #include <SDL_video.h>
 
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/geometric.hpp>
 
 #include <iostream>
 
@@ -201,6 +202,8 @@ void Game::Run() {
 
   bool w = false, a = false, s = false, d = false;
 
+  glm::vec3 portalNormal(0.0f, 0.0f, 1.0f);
+
   MAIN_LOOP_BEGIN {
     last = now;
     now = SDL_GetPerformanceCounter();
@@ -216,91 +219,97 @@ void Game::Run() {
     glStencilMask(0xFF);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    // disable depth and color masks
-    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-    glDepthMask(GL_FALSE);
-    // disable depth test
-    glDisable(GL_DEPTH_TEST);
-    // enable stencil test
-    glEnable(GL_STENCIL_TEST);
-    // always fail
-    glStencilFunc(GL_NEVER, 1, 0xFF);
-    // replace passing tests with 1
-    glStencilOp(GL_INCR, GL_KEEP, GL_KEEP);
-    glStencilMask(0xFF);
-    glClear(GL_STENCIL_BUFFER_BIT);
+    glm::vec3 portalPosition(0.0f);
+    glm::vec3 dirToPlayer = portalPosition + camera.Position();
 
-    // draw "portal" from regular viewspace
-    singleColorShader.Use();
-    {
-      glm::mat4 model = glm::scale(
-          glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(1.0f, 0.0f, 0.0f)),
-          glm::vec3(1.0f, 1.0f, 1.0f));
-      singleColorShader.SetMat4fv("model", model);
-      singleColorShader.SetMat4fv("view", view);
-      singleColorShader.SetMat4fv("projection", projection);
-      portal.Draw();
-    }
+    if (glm::dot(portalNormal, camera.Front()) < 0.0f &&
+        glm::dot(portalNormal, dirToPlayer) > 0.0f) {
+      // disable depth and color masks
+      glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+      glDepthMask(GL_FALSE);
+      // disable depth test
+      glDisable(GL_DEPTH_TEST);
+      // enable stencil test
+      glEnable(GL_STENCIL_TEST);
+      // always fail
+      glStencilFunc(GL_NEVER, 1, 0xFF);
+      // replace passing tests with 1
+      glStencilOp(GL_INCR, GL_KEEP, GL_KEEP);
+      glStencilMask(0xFF);
+      glClear(GL_STENCIL_BUFFER_BIT);
 
-    // renenable color and depth mask
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    glDepthMask(GL_TRUE);
-    glEnable(GL_DEPTH_TEST);
-    glStencilMask(0x00);
-    glStencilFunc(GL_EQUAL, 1, 0xFF);
-    glStencilOp(GL_DECR, GL_KEEP, GL_KEEP);
-
-    // draw scene from pov of other camera
-    simpleShader.Use();
-    simpleShader.SetMat4fv("view", virtCam.GetViewFromCamera(camera));
-    simpleShader.SetMat4fv("projection", projection);
-
-    for (unsigned int i = 0; i < 10; ++i) {
-      glm::mat4 model = glm::mat4(1.0f);
-      model = glm::translate(model, cubePositions[i]);
-      if (i == 0 || (i + 1) % 3 == 0) {
-        model = glm::rotate(model, (float)SDL_GetTicks64() / 1000.0f,
-                            glm::vec3(0.5f, 1.0f, 0.0f));
-      } else {
-        model = glm::rotate(model, glm::radians(20.0f * i),
-                            glm::vec3(1.0f, 0.3f, 0.5f));
+      // draw "portal" from regular viewspace
+      singleColorShader.Use();
+      {
+        glm::mat4 model = glm::scale(
+            glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(1.0f, 0.0f, 0.0f)),
+            glm::vec3(1.0f, 1.0f, 1.0f));
+        singleColorShader.SetMat4fv("model", model);
+        singleColorShader.SetMat4fv("view", view);
+        singleColorShader.SetMat4fv("projection", projection);
+        portal.Draw();
       }
-      simpleShader.SetMat4fv("model", model);
-      cube.Draw();
+
+      // renenable color and depth mask
+      glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+      glDepthMask(GL_TRUE);
+      glEnable(GL_DEPTH_TEST);
+      glStencilMask(0x00);
+      glStencilFunc(GL_EQUAL, 1, 0xFF);
+      glStencilOp(GL_DECR, GL_KEEP, GL_KEEP);
+
+      // draw scene from pov of other camera
+      simpleShader.Use();
+      simpleShader.SetMat4fv("view", virtCam.GetViewFromCamera(camera));
+      simpleShader.SetMat4fv("projection", projection);
+
+      for (unsigned int i = 0; i < 10; ++i) {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, cubePositions[i]);
+        if (i == 0 || (i + 1) % 3 == 0) {
+          model = glm::rotate(model, (float)SDL_GetTicks64() / 1000.0f,
+                              glm::vec3(0.5f, 1.0f, 0.0f));
+        } else {
+          model = glm::rotate(model, glm::radians(20.0f * i),
+                              glm::vec3(1.0f, 0.3f, 0.5f));
+        }
+        simpleShader.SetMat4fv("model", model);
+        cube.Draw();
+      }
+
+      // clear depth buffer
+      glDisable(GL_STENCIL_TEST);
+      glStencilMask(0x00);
+
+      glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+      glEnable(GL_DEPTH_TEST);
+      glDepthMask(GL_TRUE);
+      glDepthFunc(GL_ALWAYS);
+      glClear(GL_DEPTH_BUFFER_BIT);
+
+      // draw "portal" to depth buffer so it doesn't get overridden
+      singleColorShader.Use();
+      {
+        glm::mat4 model = glm::scale(
+            glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(1.0f, 0.0f, 0.0f)),
+            glm::vec3(1.0f, 1.0f, 1.0f));
+        singleColorShader.SetMat4fv("model", model);
+        singleColorShader.SetMat4fv("view", view);
+        singleColorShader.SetMat4fv("projection", projection);
+        portal.Draw();
+      }
+
+      glDepthFunc(GL_LESS);
+      glEnable(GL_STENCIL_TEST);
+      glStencilMask(0x00);
+
+      glStencilFunc(GL_LEQUAL, 0, 0xFF);
+
+      glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+      glDepthMask(GL_TRUE);
+
+      glEnable(GL_DEPTH_TEST);
     }
-
-    // clear depth buffer
-    glDisable(GL_STENCIL_TEST);
-    glStencilMask(0x00);
-
-    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
-    glDepthFunc(GL_ALWAYS);
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    // draw "portal" to depth buffer so it doesn't get overridden
-    singleColorShader.Use();
-    {
-      glm::mat4 model = glm::scale(
-          glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(1.0f, 0.0f, 0.0f)),
-          glm::vec3(1.0f, 1.0f, 1.0f));
-      singleColorShader.SetMat4fv("model", model);
-      singleColorShader.SetMat4fv("view", view);
-      singleColorShader.SetMat4fv("projection", projection);
-      portal.Draw();
-    }
-
-    glDepthFunc(GL_LESS);
-    glEnable(GL_STENCIL_TEST);
-    glStencilMask(0x00);
-
-    glStencilFunc(GL_LEQUAL, 0, 0xFF);
-
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    glDepthMask(GL_TRUE);
-
-    glEnable(GL_DEPTH_TEST);
 
     singleColorShader.Use();
     {

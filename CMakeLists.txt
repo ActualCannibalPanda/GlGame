@@ -3,12 +3,11 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
 
-project(Paradox)
+project(Paradox CXX C)
 add_executable(${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PUBLIC "{CMAKE_SOURCE_DIR}/include")
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
-set(LIB_NAME glad)
+set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(external)
 
@@ -41,8 +40,7 @@ target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
 
 target_link_libraries(
   ${PROJECT_NAME}
-  PUBLIC glm::glm OpenGL::GL ${LIB_NAME}
-         $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+  PUBLIC glm::glm OpenGL::GL glad $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
          $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static> Jolt)
 target_include_directories(
   ${PROJECT_NAME}

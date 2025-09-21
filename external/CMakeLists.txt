@@ -1,4 +1,4 @@
-add_subdirectory(GLAD)
+add_subdirectory(glad)
 add_subdirectory(glm)
 add_subdirectory(JoltPhysics/Build)
 

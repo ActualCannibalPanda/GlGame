@@ -13,13 +13,11 @@ set(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 
 add_subdirectory(external)
 
-if(WIN32)
-  # Forcing MSVC to use utf-8 encoding
-  add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
-  add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
-endif(WIN32)
-
 find_package(OpenGL REQUIRED)
+find_package(SDL2 CONFIG REQUIRED)
+find_package(Jolt CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
+find_path(TINYGLTF_INCLUDE_DIRS "tiny_gltf.h")
 
 add_custom_command(
   TARGET ${PROJECT_NAME}
@@ -42,10 +40,14 @@ target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
 
 target_link_libraries(
   ${PROJECT_NAME}
-  PUBLIC glm::glm OpenGL::GL glad $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
-         $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static> Jolt)
+  PUBLIC glm::glm-header-only
+         OpenGL::GL
+         glad
+         $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+         $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+         Jolt::Jolt)
 target_include_directories(
   ${PROJECT_NAME}
   PUBLIC ${OPENGL_INCLUDE_DIR} ${glm_INCLUDE_DIR} ${SDL2_INCLUDE_DIR}
-         ${CMAKE_SOURCE_DIR}/external/tinygltf ${JoltPhysics_SOURCE_DIR}/..
+         ${TINYGLTF_INCLUDE_DIRS} ${JoltPhysics_SOURCE_DIR}/..
          ${CMAKE_SOURCE_DIR}/include/)

@@ -1,6 +1,7 @@
 add_subdirectory(GLAD)
 add_subdirectory(glm)
 add_subdirectory(assimp)
+add_subdirectory(JoltPhysics/Build)
 
 set(TINYGLTF_HEADER_ONLY
     ON

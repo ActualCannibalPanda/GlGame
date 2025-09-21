@@ -8,6 +8,8 @@ class Camera {
 public:
   Camera(const glm::vec3& position, const glm::vec3& up, float yaw = -90.0f,
          float pitch = 0.0f);
+  Camera(const glm::vec3& position, const glm::vec3& up,
+         const glm::vec3& forward);
 
   void Move(const glm::vec3& direction, float delta);
   void Look(float dx, float dy, float delta);
@@ -16,9 +18,11 @@ public:
   glm::vec3 Position() const;
   glm::mat4 GetViewMatrix() const;
   glm::mat4 GetViewFromCamera(const Camera& other) const;
+  glm::mat4 GetRotationMatrix() const;
 
 private:
-  void UpdateCameraVectors();
+  void UpdateCameraVectors(bool calcFront = true);
+  void UpdateYawAndPitch();
 
   int m_InvertMouseY = -1;
   int m_InvertMouseX = 1;

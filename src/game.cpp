@@ -6,6 +6,7 @@
 #include <SDL_video.h>
 
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/fwd.hpp>
 #include <glm/geometric.hpp>
 
 #include <iostream>
@@ -13,6 +14,7 @@
 #include "assetdir.hpp"
 #include "camera.hpp"
 #include "model.hpp"
+#include "portal.hpp"
 #include "shader.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -171,8 +173,10 @@ void Game::Run() {
 
   glEnable(GL_DEPTH_TEST);
 
-  Camera camera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-  Camera virtCam(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  Camera camera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f),
+                glm::vec3(0.0f, 0.0f, 1.0f));
+  Camera virtCam(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f),
+                 glm::vec3(0.0f, 0.0f, 1.0f));
 
   pdx::AssetDir cubeDir{"data", "models", "cube"};
   pdx::Model cube = pdx::Model::FromGLTF(cubeDir.GetFile("scene.gltf")).value();
@@ -184,6 +188,10 @@ void Game::Run() {
   pdx::AssetDir portalFrameDir{"data", "models", "portalFrame"};
   pdx::Model portalFrame =
       pdx::Model::FromGLTF(portalFrameDir.GetFile("scene.gltf")).value();
+
+  pdx::Portal portalObj(glm::vec3(0.0f, 0.0f, 0.0f),
+                        glm::vec3(0.0f, 1.0f, 0.0f),
+                        glm::vec3(0.0f, 0.0f, 1.0f));
 
   int now = SDL_GetPerformanceCounter();
   int last = 0;

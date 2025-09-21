@@ -41,19 +41,11 @@ target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
 
 target_link_libraries(
   ${PROJECT_NAME}
-  PUBLIC glm::glm
-         OpenGL::GL
-         ${LIB_NAME}
+  PUBLIC glm::glm OpenGL::GL ${LIB_NAME}
          $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
-         $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
-         assimp
-         Jolt)
+         $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static> Jolt)
 target_include_directories(
   ${PROJECT_NAME}
-  PUBLIC ${OPENGL_INCLUDE_DIR}
-         ${glm_INCLUDE_DIR}
-         ${SDL2_INCLUDE_DIR}
-         ${ASSIMP_INCLUDE_DIR}
-         ${CMAKE_SOURCE_DIR}/external/tinygltf
-         ${JoltPhysics_SOURCE_DIR}/..
+  PUBLIC ${OPENGL_INCLUDE_DIR} ${glm_INCLUDE_DIR} ${SDL2_INCLUDE_DIR}
+         ${CMAKE_SOURCE_DIR}/external/tinygltf ${JoltPhysics_SOURCE_DIR}/..
          ${CMAKE_SOURCE_DIR}/include/)

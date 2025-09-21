@@ -9,6 +9,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC "{CMAKE_SOURCE_DIR}/include")
 
 set(CMAKE_CXX_STANDARD 20)
 
+set(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+
 add_subdirectory(external)
 
 if(WIN32)

@@ -1,6 +1,8 @@
 add_subdirectory(glad)
 add_subdirectory(glm)
+set(INTERPROCEDURAL_OPTIMIZATION ON)
 add_subdirectory(JoltPhysics/Build)
+unset(INTERPROCEDURAL_OPTIMIZATION)
 
 set(TINYGLTF_HEADER_ONLY
     ON

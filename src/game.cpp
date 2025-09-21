@@ -242,8 +242,10 @@ void Game::Run() {
       singleColorShader.Use();
       {
         glm::mat4 model = glm::scale(
-            glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(1.0f, 0.0f, 0.0f)),
-            glm::vec3(1.0f, 1.0f, 1.0f));
+            glm::rotate(
+                glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+                glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)),
+            glm::vec3(2.0f, 2.0f, 2.0f));
         singleColorShader.SetMat4fv("model", model);
         singleColorShader.SetMat4fv("view", view);
         singleColorShader.SetMat4fv("projection", projection);
@@ -291,8 +293,10 @@ void Game::Run() {
       singleColorShader.Use();
       {
         glm::mat4 model = glm::scale(
-            glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(1.0f, 0.0f, 0.0f)),
-            glm::vec3(1.0f, 1.0f, 1.0f));
+            glm::rotate(
+                glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+                glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)),
+            glm::vec3(2.0f, 2.0f, 2.0f));
         singleColorShader.SetMat4fv("model", model);
         singleColorShader.SetMat4fv("view", view);
         singleColorShader.SetMat4fv("projection", projection);
@@ -314,8 +318,10 @@ void Game::Run() {
     singleColorShader.Use();
     {
       glm::mat4 model = glm::scale(
-          glm::rotate(glm::mat4(1.0f), 90.0f, glm::vec3(1.0f, 0.0f, 0.0f)),
-          glm::vec3(0.5f, 0.5f, 0.5f));
+          glm::rotate(
+              glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 1.0f)),
+              glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)),
+          glm::vec3(1.0f, 1.0f, 1.0f));
       singleColorShader.SetMat4fv("model", model);
       singleColorShader.SetMat4fv("view", view);
       singleColorShader.SetMat4fv("projection", projection);

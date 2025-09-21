@@ -174,7 +174,7 @@ void Game::Run() {
   glEnable(GL_DEPTH_TEST);
 
   Camera camera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f),
-                glm::vec3(0.0f, 0.0f, 1.0f));
+                glm::vec3(0.0f, 0.0f, -1.0f));
   Camera virtCam(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f),
                  glm::vec3(0.0f, 0.0f, 1.0f));
 

@@ -25,7 +25,7 @@ private:
   void UpdateYawAndPitch();
 
   int m_InvertMouseY = -1;
-  int m_InvertMouseX = 1;
+  int m_InvertMouseX = -1;
 
   glm::vec3 m_Position;
   glm::vec3 m_Front;

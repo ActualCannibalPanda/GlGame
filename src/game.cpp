@@ -188,6 +188,9 @@ void Game::Run() {
   pdx::AssetDir portalFrameDir{"data", "models", "portalFrame"};
   pdx::Model portalFrame =
       pdx::Model::FromGLTF(portalFrameDir.GetFile("scene.gltf")).value();
+  pdx::AssetDir floorDir{"data", "models", "floor"};
+  pdx::Model floor =
+      pdx::Model::FromGLTF(floorDir.GetFile("scene.gltf")).value();
 
   pdx::Portal portalObj(glm::vec3(0.0f, 0.0f, 0.0f),
                         glm::vec3(0.0f, 1.0f, 0.0f),
@@ -328,6 +331,16 @@ void Game::Run() {
       portalFrame.Draw();
     }
 
+    simpleShader.Use();
+    {
+      glm::mat4 model = glm::scale(
+          glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -3.0, 0.0f)),
+          glm::vec3(3.0f, 1.0f, 3.0f));
+      simpleShader.SetMat4fv("model", model);
+      singleColorShader.SetMat4fv("view", view);
+      singleColorShader.SetMat4fv("projection", projection);
+      floor.Draw();
+    }
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       switch (event.type) {

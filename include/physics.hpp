@@ -31,9 +31,6 @@ public:
   GamePhysics() = default;
   ~GamePhysics();
 
-  auto GenerateBoxShape(const JPH::BodyCreationSettings& settings,
-                        JPH::EActivation activation) -> JPH::BodyID;
-
 private:
   auto InitPhysics() -> void;
 

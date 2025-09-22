@@ -23,7 +23,6 @@
 #include <cassert>
 #include <cstdarg>
 #include <iostream>
-#include <type_traits>
 
 using namespace pdx;
 
@@ -191,35 +190,4 @@ auto GamePhysics::InitPhysics() -> void {
 
   MyContactListener contactListener;
   m_PhysicsSystem.SetContactListener(&contactListener);
-
-  JPH::BodyInterface& bodyInterface = m_PhysicsSystem.GetBodyInterface();
-
-  JPH::BoxShapeSettings floorShapeSettings(JPH::Vec3(100.0f, 1.0f, 100.0f));
-  floorShapeSettings.SetEmbedded();
-
-  JPH::ShapeSettings::ShapeResult floorShapeResult =
-      floorShapeSettings.Create();
-  JPH::ShapeRefC floorShape = floorShapeResult.Get();
-
-  JPH::BodyCreationSettings floorSettings(
-      floorShape, JPH::RVec3(0.0_r, -1.0_r, 0.0_r), JPH::Quat::sIdentity(),
-      JPH::EMotionType::Static, Layers::NON_MOVING);
-
-  JPH::Body *floor = bodyInterface.CreateBody(floorSettings);
-
-  bodyInterface.AddBody(floor->GetID(), JPH::EActivation::DontActivate);
-
-  JPH::BodyCreationSettings sphereSettings(
-      new JPH::SphereShape(0.5f), JPH::RVec3(0.0_r, 2.0_r, 0.0_r),
-      JPH::Quat::sIdentity(), JPH::EMotionType::Dynamic, Layers::MOVING);
-  JPH::BodyID sphereId = bodyInterface.CreateAndAddBody(
-      sphereSettings, JPH::EActivation::Activate);
-
-  bodyInterface.SetLinearVelocity(sphereId, JPH::Vec3(0.0f, -5.0f, 0.0f));
-}
-
-auto GamePhysics::GenerateBoxShape(const JPH::BodyCreationSettings& settings,
-                                   JPH::EActivation activation) -> JPH::BodyID {
-  JPH::BodyInterface& bodyInterface = m_PhysicsSystem.GetBodyInterface();
-  return bodyInterface.CreateAndAddBody(settings, activation);
 }

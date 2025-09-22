@@ -20,6 +20,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <external/stb_image.h>
 
+#include <imgui.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl2.h>
+
 using namespace pdx;
 
 // clang-format off
@@ -164,6 +168,11 @@ Game::Game(const std::string& title, int screenWidth, int screenHeight) {
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr,
                           GL_TRUE);
   }
+
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGui_ImplSDL2_InitForOpenGL(m_Window, m_Context);
+  ImGui_ImplOpenGL3_Init();
 }
 
 void Game::Run() {
@@ -205,6 +214,7 @@ void Game::Run() {
   bool w = false, a = false, s = false, d = false;
 
   glm::vec3 portalNormal(0.0f, 0.0f, 1.0f);
+  uint64_t frameStart = SDL_GetTicks64();
 
   bool running = true;
   do {
@@ -212,6 +222,69 @@ void Game::Run() {
     now = SDL_GetPerformanceCounter();
 
     delta = (double)(now - last) / (double)SDL_GetPerformanceFrequency();
+
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+      ImGui_ImplSDL2_ProcessEvent(&event);
+      switch (event.type) {
+      case SDL_QUIT:
+        running = false;
+        continue;
+      case SDL_MOUSEMOTION:
+        camera.Look((float)event.motion.xrel, (float)event.motion.yrel, delta);
+        break;
+      case SDL_KEYDOWN:
+        switch (event.key.keysym.sym) {
+        case SDLK_w:
+          w = true;
+          break;
+        case SDLK_s:
+          s = true;
+          break;
+        case SDLK_a:
+          a = true;
+          break;
+        case SDLK_d:
+          d = true;
+          break;
+        case SDLK_ESCAPE:
+          running = false;
+          continue;
+        }
+        break;
+      case SDL_KEYUP:
+        switch (event.key.keysym.sym) {
+        case SDLK_w:
+          w = false;
+          break;
+        case SDLK_s:
+          s = false;
+          break;
+        case SDLK_a:
+          a = false;
+          break;
+        case SDLK_d:
+          d = false;
+          break;
+        }
+        break;
+      }
+    }
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    ImGui::NewFrame();
+
+    {
+      ImGui::Begin("FPS");
+      uint64_t msec = SDL_GetTicks64() - frameStart;
+      if (msec > 0.0f) {
+        uint64_t fps = 1.0 / (msec / (double)SDL_GetPerformanceFrequency());
+        ImGui::Text("FPS: %llu", fps);
+      }
+      frameStart = SDL_GetTicks64();
+      ImGui::End();
+    }
 
     glm::mat4 view = camera.GetViewMatrix();
     glm::mat4 projection = glm::perspective(
@@ -341,52 +414,6 @@ void Game::Run() {
       simpleShader.SetMat4fv("projection", projection);
       floor.Draw();
     }
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-      switch (event.type) {
-      case SDL_QUIT:
-        running = false;
-        continue;
-      case SDL_MOUSEMOTION:
-        camera.Look((float)event.motion.xrel, (float)event.motion.yrel, delta);
-        break;
-      case SDL_KEYDOWN:
-        switch (event.key.keysym.sym) {
-        case SDLK_w:
-          w = true;
-          break;
-        case SDLK_s:
-          s = true;
-          break;
-        case SDLK_a:
-          a = true;
-          break;
-        case SDLK_d:
-          d = true;
-          break;
-        case SDLK_ESCAPE:
-          running = false;
-          continue;
-        }
-        break;
-      case SDL_KEYUP:
-        switch (event.key.keysym.sym) {
-        case SDLK_w:
-          w = false;
-          break;
-        case SDLK_s:
-          s = false;
-          break;
-        case SDLK_a:
-          a = false;
-          break;
-        case SDLK_d:
-          d = false;
-          break;
-        }
-        break;
-      }
-    }
 
     glm::vec3 moveDirection(0.0f);
     if (w) {
@@ -402,6 +429,17 @@ void Game::Run() {
       moveDirection.x += 1.0f;
     }
     camera.Move(moveDirection, delta);
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     SDL_GL_SwapWindow(m_Window);
   } while (running);
+
+  ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplSDL2_Shutdown();
+  ImGui::DestroyContext();
+
+  SDL_GL_DeleteContext(m_Context);
+  SDL_DestroyWindow(m_Window);
+  SDL_Quit();
 }

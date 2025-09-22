@@ -1,8 +1,8 @@
 {
   "dependencies": [
+    "glm",
     "joltphysics",
     "sdl2",
-    "tinygltf",
-    "glm"
+    "tinygltf"
   ]
 }

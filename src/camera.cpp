@@ -18,13 +18,13 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& up,
   UpdateYawAndPitch();
 }
 
-void Camera::Move(const glm::vec3& direction, float delta) {
+auto Camera::Move(const glm::vec3& direction, float delta) -> void {
   m_Position += m_Front * direction.z * m_MovementSpeed * delta;
   m_Position += m_Right * direction.x * m_MovementSpeed * delta;
   m_Position += m_Up * direction.y * m_MovementSpeed * delta;
 }
 
-void Camera::Look(float dx, float dy, float delta) {
+auto Camera::Look(float dx, float dy, float delta) -> void {
   m_Yaw += dx * m_Sensitivity * m_InvertMouseX;
   m_Pitch += dy * m_Sensitivity * m_InvertMouseY;
 
@@ -38,15 +38,15 @@ void Camera::Look(float dx, float dy, float delta) {
   UpdateCameraVectors();
 }
 
-glm::vec3 Camera::Front() const { return m_Front; }
+auto Camera::Front() const -> glm::vec3 { return m_Front; }
 
-glm::vec3 Camera::Position() const { return m_Position; }
+auto Camera::Position() const -> glm::vec3 { return m_Position; }
 
-glm::mat4 Camera::GetViewMatrix() const {
+auto Camera::GetViewMatrix() const -> glm::mat4 {
   return glm::lookAt(m_Position, m_Position + m_Front, m_Up);
 }
 
-glm::mat4 Camera::GetRotationMatrix() const {
+auto Camera::GetRotationMatrix() const -> glm::mat4 {
   float alpha = m_Yaw;
   float beta = m_Pitch;
 
@@ -74,11 +74,30 @@ glm::mat4 Camera::GetRotationMatrix() const {
   return R_z * R_y;
 }
 
-glm::mat4 Camera::GetViewFromCamera(const Camera& other) const {
+auto Camera::GetViewFromCamera(const Camera& other) const -> glm:: mat4 {
   return other.GetViewMatrix();
 }
 
-void Camera::UpdateCameraVectors(bool calcFront) {
+auto Camera::SetSpeed(float value) -> void {
+  if (value < 0.0) {
+    return;
+  }
+  m_MovementSpeed = value;
+}
+auto Camera::SetSensitivity(float value) -> void {
+  if (value < 0.0) {
+    return;
+  }
+  m_Sensitivity = value;
+}
+auto Camera::SetZoom(float value) -> void {
+  if (value < 0.0) {
+    return;
+  }
+  m_Zoom = value;
+}
+
+auto Camera::UpdateCameraVectors(bool calcFront) -> void {
   if (calcFront) {
     glm::vec3 front;
     front.x = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
@@ -90,7 +109,7 @@ void Camera::UpdateCameraVectors(bool calcFront) {
   m_Up = glm::normalize(glm::cross(m_Right, m_Front));
 }
 
-void Camera::UpdateYawAndPitch() {
+auto Camera::UpdateYawAndPitch() -> void {
   glm::vec3 vec = m_Front;
   glm::mat4 view = GetViewMatrix();
   m_Yaw = glm::degrees(atan2(vec.x, vec.z));

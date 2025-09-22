@@ -11,18 +11,23 @@ public:
   Camera(const glm::vec3& position, const glm::vec3& up,
          const glm::vec3& forward);
 
-  void Move(const glm::vec3& direction, float delta);
-  void Look(float dx, float dy, float delta);
+  auto Move(const glm::vec3& direction, float delta) -> void;
+  auto Look(float dx, float dy, float delta) -> void;
 
-  glm::vec3 Front() const;
-  glm::vec3 Position() const;
-  glm::mat4 GetViewMatrix() const;
-  glm::mat4 GetViewFromCamera(const Camera& other) const;
-  glm::mat4 GetRotationMatrix() const;
+  auto Front() const -> glm::vec3;
+  auto Position() const -> glm::vec3;
+
+  auto GetViewMatrix() const -> glm::mat4;
+  auto GetViewFromCamera(const Camera& other) const -> glm::mat4;
+  auto GetRotationMatrix() const -> glm::mat4;
+
+  auto SetSpeed(float value) -> void;
+  auto SetSensitivity(float value) -> void;
+  auto SetZoom(float value) -> void;
 
 private:
-  void UpdateCameraVectors(bool calcFront = true);
-  void UpdateYawAndPitch();
+  auto UpdateCameraVectors(bool calcFront = true) -> void;
+  auto UpdateYawAndPitch() -> void;
 
   int m_InvertMouseY = -1;
   int m_InvertMouseX = -1;

@@ -52,7 +52,6 @@ static void BindMesh(std::map<int, GLuint>& vbos,
   for (size_t i = 0; i < model.bufferViews.size(); ++i) {
     const tinygltf::BufferView& bufferView = model.bufferViews[i];
     if (bufferView.target == 0) {
-      std::cout << "WARN: bufferView.target is zero" << std::endl;
       continue;
     }
 

@@ -12,7 +12,7 @@ class AssetDir {
 public:
   AssetDir(std::initializer_list<std::string> paths);
 
-  pdx::path GetFile(const char *filename) const;
+  auto GetFile(const char *filename) const -> pdx::path;
 
 private:
   pdx::path m_BaseDir;

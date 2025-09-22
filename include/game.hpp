@@ -13,7 +13,7 @@ class Game {
 public:
   Game();
   Game(const std::string& title, int screenWidth, int screenHeight);
-  void Run();
+  auto Run() -> void;
 
 protected:
   int m_WindowWidth, m_WindowHeight;

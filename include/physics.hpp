@@ -8,6 +8,8 @@
 #include <Jolt/Physics/Collision/ObjectLayer.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 
+#include <memory>
+
 namespace pdx {
 namespace Layers {
 static constexpr JPH::ObjectLayer NON_MOVING = 0;

@@ -9,7 +9,7 @@ AssetDir::AssetDir(std::initializer_list<std::string> paths)
   }
 }
 
-std::filesystem::path AssetDir::GetFile(const char *filename) const {
+auto AssetDir::GetFile(const char *filename) const -> pdx::path {
   auto path = m_BaseDir / filename;
   return path;
 }

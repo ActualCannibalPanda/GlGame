@@ -41,9 +41,10 @@ glm::vec3 cubePositions[] = {
 };
 // clang-format on
 
-void GLAPIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id,
+auto GLAPIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id,
                               GLenum severity, GLsizei length,
-                              const char *message, const void *userParam) {
+                              const char *message, const void *userParam)
+    -> void {
   // ignore non-significant error/warning codes
   if (id == 131169 || id == 131185 || id == 131218 || id == 131204)
     return;
@@ -175,7 +176,7 @@ Game::Game(const std::string& title, int screenWidth, int screenHeight) {
   ImGui_ImplOpenGL3_Init();
 }
 
-void Game::Run() {
+auto Game::Run() -> void {
   pdx::Shader simpleShader("simple.vert", "simple.frag");
   pdx::Shader singleColorShader("singleColor.vert", "singleColor.frag");
   pdx::Shader lightShader("light.vert", "light.frag");
@@ -280,7 +281,7 @@ void Game::Run() {
       uint64_t msec = SDL_GetTicks64() - frameStart;
       if (msec > 0.0f) {
         uint64_t fps = 1.0 / (msec / (double)SDL_GetPerformanceFrequency());
-        ImGui::Text("FPS: %llu", fps);
+        ImGui::Text("FPS: %lu", fps);
       }
       frameStart = SDL_GetTicks64();
       ImGui::End();

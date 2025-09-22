@@ -80,50 +80,53 @@ Shader::Shader(const std::string& vertFile, const std::string& fragFile) {
   glDeleteShader(frag);
 }
 
-void Shader::Use() const { glUseProgram(m_Program); }
+auto Shader::Use() const -> void { glUseProgram(m_Program); }
 
-void Shader::Set1f(const std::string& name, float x) const {
+auto Shader::Set1f(const std::string& name, float x) const -> void {
   glUniform1f(glGetUniformLocation(m_Program, name.c_str()), x);
 }
-void Shader::Set2f(const std::string& name, float x, float y) const {
+auto Shader::Set2f(const std::string& name, float x, float y) const -> void {
   glUniform2f(glGetUniformLocation(m_Program, name.c_str()), x, y);
 }
-void Shader::Set3f(const std::string& name, float x, float y, float z) const {
+auto Shader::Set3f(const std::string& name, float x, float y, float z) const
+    -> void {
 
   glUniform3f(glGetUniformLocation(m_Program, name.c_str()), x, y, z);
 }
-void Shader::Set4f(const std::string& name, float x, float y, float z,
-                   float w) const {
+auto Shader::Set4f(const std::string& name, float x, float y, float z,
+                   float w) const -> void {
   glUniform4f(glGetUniformLocation(m_Program, name.c_str()), x, y, z, w);
 }
-void Shader::Set1i(const std::string& name, int x) const {
+auto Shader::Set1i(const std::string& name, int x) const -> void {
   glUniform1i(glGetUniformLocation(m_Program, name.c_str()), x);
 }
-void Shader::Set2i(const std::string& name, int x, int y) const {
+auto Shader::Set2i(const std::string& name, int x, int y) const -> void {
   glUniform2i(glGetUniformLocation(m_Program, name.c_str()), x, y);
 }
-void Shader::Set3i(const std::string& name, int x, int y, int z) const {
-
+auto Shader::Set3i(const std::string& name, int x, int y, int z) const -> void {
   glUniform3f(glGetUniformLocation(m_Program, name.c_str()), x, y, z);
 }
-void Shader::Set4i(const std::string& name, int x, int y, int z, int w) const {
+auto Shader::Set4i(const std::string& name, int x, int y, int z, int w) const
+    -> void {
   glUniform4f(glGetUniformLocation(m_Program, name.c_str()), x, y, z, w);
 }
-void Shader::SetMat4fv(const std::string& name, const glm::mat4x4& value,
-                       bool transpose) const {
-
+auto Shader::SetMat4fv(const std::string& name, const glm::mat4x4& value,
+                       bool transpose) const -> void {
   glUniformMatrix4fv(glGetUniformLocation(m_Program, name.c_str()), 1,
                      transpose, glm::value_ptr(value));
 }
-void Shader::Set2fv(const std::string& name, const glm::vec2& value) const {
+auto Shader::Set2fv(const std::string& name, const glm::vec2& value) const
+    -> void {
   glUniform2fv(glGetUniformLocation(m_Program, name.c_str()), 1,
                glm::value_ptr(value));
 }
-void Shader::Set3fv(const std::string& name, const glm::vec3& value) const {
+auto Shader::Set3fv(const std::string& name, const glm::vec3& value) const
+    -> void {
   glUniform3fv(glGetUniformLocation(m_Program, name.c_str()), 1,
                glm::value_ptr(value));
 }
-void Shader::Set4fv(const std::string& name, const glm::vec4& value) const {
+auto Shader::Set4fv(const std::string& name, const glm::vec4& value) const
+    -> void {
   glUniform4fv(glGetUniformLocation(m_Program, name.c_str()), 1,
                glm::value_ptr(value));
 }

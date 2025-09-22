@@ -2,6 +2,7 @@
 #define __HPP_PARADOX_PORTAL__
 
 #include "camera.hpp"
+
 namespace pdx {
 class Portal {
 public:

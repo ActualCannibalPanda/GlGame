@@ -22,7 +22,7 @@ Model::Model(tinygltf::Model& model, pdx::vao_t vao, std::map<int, GLuint> ebos,
              std::map<int, GLuint> textures)
     : m_Model(model), m_Vao(vao), m_Ebos(ebos), m_Textures(textures) {}
 
-static bool LoadModel(tinygltf::Model& model, const pdx::path& path) {
+static auto LoadModel(tinygltf::Model& model, const pdx::path& path) -> bool {
   tinygltf::TinyGLTF loader;
   std::string err;
   std::string warn;
@@ -46,9 +46,9 @@ static bool LoadModel(tinygltf::Model& model, const pdx::path& path) {
   return res;
 }
 
-static void BindMesh(std::map<int, GLuint>& vbos,
+static auto BindMesh(std::map<int, GLuint>& vbos,
                      std::map<int, GLuint>& textures, tinygltf::Model& model,
-                     tinygltf::Mesh& mesh) {
+                     tinygltf::Mesh& mesh) -> void {
   for (size_t i = 0; i < model.bufferViews.size(); ++i) {
     const tinygltf::BufferView& bufferView = model.bufferViews[i];
     if (bufferView.target == 0) {
@@ -148,9 +148,10 @@ static void BindMesh(std::map<int, GLuint>& vbos,
   }
 }
 
-static void BindModelNodes(std::map<int, GLuint>& vbos,
+static auto BindModelNodes(std::map<int, GLuint>& vbos,
                            std::map<int, GLuint>& textures,
-                           tinygltf::Model& model, tinygltf::Node& node) {
+                           tinygltf::Model& model, tinygltf::Node& node)
+    -> void {
   if ((node.mesh >= 0) && (node.mesh < model.meshes.size())) {
     BindMesh(vbos, textures, model, model.meshes[node.mesh]);
   }
@@ -193,7 +194,7 @@ std::optional<Model> Model::FromGLTF(const pdx::path& path) {
   return std::make_optional(Model(model, vao, vbos, textures));
 }
 
-void Model::Draw() const {
+auto Model::Draw() const -> void {
   glBindVertexArray(m_Vao);
   for (size_t i = 0; i < m_Textures.size(); ++i) {
     glActiveTexture(GL_TEXTURE0 + i);
@@ -210,7 +211,7 @@ void Model::Draw() const {
   glBindVertexArray(0);
 }
 
-void Model::DrawNodes(const tinygltf::Node& node) const {
+auto Model::DrawNodes(const tinygltf::Node& node) const -> void {
   if ((node.mesh >= 0) && (node.mesh < m_Model.meshes.size())) {
     DrawMesh(m_Model.meshes[node.mesh]);
   }
@@ -221,7 +222,7 @@ void Model::DrawNodes(const tinygltf::Node& node) const {
   }
 }
 
-void Model::DrawMesh(const tinygltf::Mesh& mesh) const {
+auto Model::DrawMesh(const tinygltf::Mesh& mesh) const -> void {
   for (size_t i = 0; i < mesh.primitives.size(); ++i) {
     tinygltf::Primitive primitive = mesh.primitives[i];
     tinygltf::Accessor indexAccessor = m_Model.accessors[primitive.indices];

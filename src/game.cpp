@@ -281,7 +281,12 @@ auto Game::Run() -> void {
       uint64_t msec = SDL_GetTicks64() - frameStart;
       if (msec > 0.0f) {
         uint64_t fps = 1.0 / (msec / (double)SDL_GetPerformanceFrequency());
+        // this is just to stop a warning from showing up on different compilers
+#ifdef WIN32
+        ImGui::Text("FPS: %llu", fps);
+#else
         ImGui::Text("FPS: %lu", fps);
+#endif
       }
       frameStart = SDL_GetTicks64();
       ImGui::End();

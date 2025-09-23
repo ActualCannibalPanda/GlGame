@@ -153,11 +153,11 @@ Game::Game(const std::string& title, int screenWidth, int screenHeight) {
 
   SDL_SetRelativeMouseMode(SDL_TRUE);
   SDL_GL_SetSwapInterval(1);
+  SDL_SetWindowFullscreen(m_Window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+  SDL_GetWindowSizeInPixels(m_Window, (int *)&m_WindowWidth,
+                            (int *)&m_WindowHeight);
 
-  m_WindowWidth = screenWidth;
-  m_WindowHeight = screenHeight;
-
-  glViewport(0, 0, screenWidth, screenHeight);
+  glViewport(0, 0, m_WindowWidth, m_WindowHeight);
   glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 
   int flags;

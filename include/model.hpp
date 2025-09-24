@@ -15,7 +15,8 @@ class Model {
 public:
   auto Draw() const -> void;
 
-  static auto FromGLTF(const pdx::path& file) -> std::optional<Model>;
+  static auto FromGLTF(const std::filesystem::path& file)
+      -> std::optional<Model>;
 
 private:
   Model(tinygltf::Model& model, pdx::vao_t vao, std::map<int, GLuint> vbos,

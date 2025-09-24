@@ -22,7 +22,8 @@ Model::Model(tinygltf::Model& model, pdx::vao_t vao, std::map<int, GLuint> ebos,
              std::map<int, GLuint> textures)
     : m_Model(model), m_Vao(vao), m_Ebos(ebos), m_Textures(textures) {}
 
-static auto LoadModel(tinygltf::Model& model, const pdx::path& path) -> bool {
+static auto LoadModel(tinygltf::Model& model, const std::filesystem::path& path)
+    -> bool {
   tinygltf::TinyGLTF loader;
   std::string err;
   std::string warn;
@@ -162,7 +163,7 @@ static auto BindModelNodes(std::map<int, GLuint>& vbos,
   }
 }
 
-std::optional<Model> Model::FromGLTF(const pdx::path& path) {
+std::optional<Model> Model::FromGLTF(const std::filesystem::path& path) {
   tinygltf::Model model;
 
   if (!LoadModel(model, path)) {

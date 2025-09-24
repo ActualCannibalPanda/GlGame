@@ -187,7 +187,7 @@ auto Game::Run() -> void {
   glm::mat4 projection = glm::perspective(
       glm::radians(45.0f), (float)m_WindowWidth / (float)m_WindowHeight, 0.1f,
       100.0f);
-  Camera camera(glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f),
+  Camera camera(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f),
                 glm::vec3(0.0f, 0.0f, -1.0f), projection);
 
   pdx::AssetDir cubeDir{"data", "models", "cube"};
@@ -207,12 +207,11 @@ auto Game::Run() -> void {
   glm::vec3 cubePosition(0.0f, 0.0f, 0.0f);
   pdx::Portal portalA(pdx::Camera(glm::vec3(0.0f, 0.0f, 4.0f),
                                   glm::vec3(0.0f, 1.0f, 0.0f),
-                                  glm::vec3(0.0f, 0.0f, -1.0f), projection),
-                      0);
+                                  glm::vec3(0.0f, 0.0f, -1.0f), projection));
+  portalA.AddAngle(180.0f, glm::vec3(0.0f, 0.0f, 1.0f));
   pdx::Portal portalB(pdx::Camera(glm::vec3(0.0f, 0.0f, -4.0f),
                                   glm::vec3(0.0f, 1.0f, 0.0f),
-                                  glm::vec3(0.0f, 0.0f, 1.0f), projection),
-                      180);
+                                  glm::vec3(0.0f, 0.0f, 1.0f), projection));
 
   portalA.SetDestination(&portalB);
   portalB.SetDestination(&portalA);
@@ -341,12 +340,15 @@ auto Game::Run() -> void {
   SDL_Quit();
 }
 
-constexpr uint32_t MAX_RECURSION_LIMIT = 3;
+constexpr uint32_t MAX_RECURSION_LIMIT = 5;
 
 auto Game::DrawPortals(const glm::mat4& view, const glm::mat4& projection,
                        uint32_t recursionLevel) const -> void {
   pdx::Shader simpleShader("simple.vert", "simple.frag");
   pdx::Shader singleColorShader("singleColor.vert", "singleColor.frag");
+
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
 
   for (const auto& portal : m_Portals) {
     // disable depth and color masks
@@ -357,18 +359,19 @@ auto Game::DrawPortals(const glm::mat4& view, const glm::mat4& projection,
     // enable stencil test
     glEnable(GL_STENCIL_TEST);
     // always fail
-    glStencilFunc(GL_NOTEQUAL, recursionLevel, 0xFF);
+    glStencilFuncSeparate(GL_FRONT, GL_NOTEQUAL, recursionLevel, 0xFF);
     // replace passing tests with 1
-    glStencilOp(GL_INCR, GL_KEEP, GL_KEEP);
-    glStencilMask(0xFF);
+    glStencilOpSeparate(GL_FRONT, GL_INCR, GL_KEEP, GL_KEEP);
+    glStencilMaskSeparate(GL_FRONT, 0xFF);
 
     portal.DrawPortalPlane(view, projection, singleColorShader);
 
-    glm::mat4 destView = view * portal.ModelMatrix() *
-                         glm::rotate(glm::mat4(1.0f), glm::radians(180.0f),
-                                     glm::vec3(0.0f, 0.0f, 1.0f)) *
-                         glm::inverse(portal.GetDestination()->ModelMatrix());
-
+    glm::mat4 destView =
+        view * portal.ModelMatrix() *
+        glm::rotate(glm::mat4(1.0f), glm::radians(180.0f),
+                    glm::vec3(0.0f, 1.0f, 0.0f) *
+                        portal.GetDestination()->Orientation()) *
+        glm::inverse(portal.GetDestination()->ModelMatrix());
     if (recursionLevel == MAX_RECURSION_LIMIT) {
       // renenable color and depth mask
       glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
@@ -376,8 +379,8 @@ auto Game::DrawPortals(const glm::mat4& view, const glm::mat4& projection,
       glClear(GL_DEPTH_BUFFER_BIT);
       glEnable(GL_DEPTH_TEST);
       glEnable(GL_STENCIL_TEST);
-      glStencilMask(0x00);
-      glStencilFunc(GL_EQUAL, recursionLevel + 1, 0xFF);
+      glStencilMaskSeparate(GL_FRONT, 0x00);
+      glStencilFuncSeparate(GL_FRONT, GL_EQUAL, recursionLevel + 1, 0xFF);
 
       DrawLevel(destView, portal.ClippedProj(destView, projection));
     } else {
@@ -389,18 +392,18 @@ auto Game::DrawPortals(const glm::mat4& view, const glm::mat4& projection,
     glDepthMask(GL_FALSE);
 
     glEnable(GL_STENCIL_TEST);
-    glStencilMask(0xFF);
+    glStencilMaskSeparate(GL_FRONT, 0xFF);
 
     glEnable(GL_DEPTH_TEST);
 
-    glStencilFunc(GL_NOTEQUAL, recursionLevel + 1, 0xFF);
-    glStencilOp(GL_DECR, GL_KEEP, GL_KEEP);
+    glStencilFuncSeparate(GL_FRONT, GL_NOTEQUAL, recursionLevel + 1, 0xFF);
+    glStencilOpSeparate(GL_FRONT, GL_DECR, GL_KEEP, GL_KEEP);
 
     portal.DrawPortalPlane(view, projection, singleColorShader);
   }
 
   glDisable(GL_STENCIL_TEST);
-  glStencilMask(0x00);
+  glStencilMaskSeparate(GL_FRONT, 0x00);
 
   glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
   glEnable(GL_DEPTH_TEST);
@@ -415,8 +418,8 @@ auto Game::DrawPortals(const glm::mat4& view, const glm::mat4& projection,
   glDepthFunc(GL_LESS);
 
   glEnable(GL_STENCIL_TEST);
-  glStencilMask(0x00);
-  glStencilFunc(GL_LEQUAL, recursionLevel, 0xFF);
+  glStencilMaskSeparate(GL_FRONT, 0x00);
+  glStencilFuncSeparate(GL_FRONT, GL_LEQUAL, recursionLevel, 0xFF);
   glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
   glDepthMask(GL_TRUE);
   glEnable(GL_DEPTH_TEST);

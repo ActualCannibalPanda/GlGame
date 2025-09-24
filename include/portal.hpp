@@ -8,7 +8,7 @@
 namespace pdx {
 class Portal {
 public:
-  Portal(const pdx::Camera& viewPoint, float rotation);
+  Portal(const pdx::Camera& viewPoint);
 
   auto Position() const -> glm::vec3;
   auto Front() const -> glm::vec3;
@@ -26,8 +26,12 @@ public:
 
   auto SetDestination(pdx::Portal *portal) -> void;
   auto GetDestination() const -> pdx::Portal *;
+  auto Orientation() const -> glm::fquat;
+
+  auto AddAngle(float angle, const glm::vec3& axis) -> void;
 
 private:
+  glm::fquat m_Orientation;
   pdx::Camera m_Viewpoint;
   pdx::Portal *m_Destination;
   glm::mat4 m_ModelMatrix;

@@ -3,7 +3,10 @@
 #include "model.hpp"
 
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/quaternion_trigonometric.hpp>
+#include <glm/fwd.hpp>
 #include <glm/gtc/matrix_access.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 using namespace pdx;
 
@@ -12,20 +15,19 @@ static AssetDir portalFrameDir{"data", "models", "portalFrame"};
 static std::optional<pdx::Model> portalPlane = {};
 static std::optional<pdx::Model> portalFrame = {};
 
-Portal::Portal(const pdx::Camera& viewpoint, float rotation)
-    : m_Viewpoint(viewpoint) {
+Portal::Portal(const pdx::Camera& viewpoint) : m_Viewpoint(viewpoint) {
   if (!portalPlane.has_value()) {
     portalPlane = pdx::Model::FromGLTF(portalPlaneDir.GetFile("scene.gltf"));
   }
   if (!portalFrame.has_value()) {
     portalFrame = pdx::Model::FromGLTF(portalFrameDir.GetFile("scene.gltf"));
   }
+  m_Orientation =
+      glm::fquat(1.0f, 0.0f, 0.0f, 0.0f) *
+      glm::angleAxis(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
   m_ModelMatrix = glm::mat4(1.0);
-  m_ModelMatrix = glm::translate(m_ModelMatrix, m_Viewpoint.Position());
-  m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(90.0f),
-                              glm::vec3(1.0f, 0.0f, 0.0f));
-  m_ModelMatrix = glm::rotate(m_ModelMatrix, glm::radians(rotation),
-                              glm::vec3(0.0f, 0.0f, 1.0f));
+  m_ModelMatrix = glm::translate(m_ModelMatrix, m_Viewpoint.Position()) *
+                  glm::mat4_cast(m_Orientation);
 }
 
 auto Portal::DrawPortalFrame(const glm::mat4& view, const glm::mat4& proj,
@@ -62,9 +64,8 @@ auto Portal::GetCamera() const -> pdx::Camera { return m_Viewpoint; }
 auto Portal::ClippedProj(const glm::mat4& view, const glm::mat4& proj) const
     -> glm::mat4 {
   float d = glm::length(Position());
-  glm::vec3 newClipPlaneNormal = Front();
   // Calculate the clip plane with a normal and distance to the origin
-  glm::vec4 newClipPlane(newClipPlaneNormal, d);
+  glm::vec4 newClipPlane(m_Orientation * glm::vec3(0.0f, 0.0f, -1.0f), d);
   newClipPlane = glm::inverse(glm::transpose(view)) * newClipPlane;
   // If the new clip plane's fourth component (w) is greater than 0, indicating
   // that it is facing away from the camera,
@@ -85,3 +86,10 @@ auto Portal::SetDestination(pdx::Portal *portal) -> void {
 }
 
 auto Portal::GetDestination() const -> pdx::Portal * { return m_Destination; }
+auto Portal::Orientation() const -> glm::fquat { return m_Orientation; }
+
+auto Portal::AddAngle(float angle, const glm::vec3& axis) -> void {
+  m_Orientation *= glm::angleAxis(glm::radians(angle), axis);
+  m_ModelMatrix = glm::translate(glm::mat4(1.0f), Position()) *
+                  glm::mat4_cast(m_Orientation);
+}

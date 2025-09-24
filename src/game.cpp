@@ -188,7 +188,7 @@ auto Game::Run() -> void {
       glm::radians(45.0f), (float)m_WindowWidth / (float)m_WindowHeight, 0.1f,
       100.0f);
   Camera camera(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f),
-                glm::vec3(0.0f, 0.0f, -1.0f), projection);
+                glm::vec3(0.0f, 0.0f, -1.0f));
 
   pdx::AssetDir cubeDir{"data", "models", "cube"};
   pdx::Model cube = pdx::Model::FromGLTF(cubeDir.GetFile("scene.gltf")).value();
@@ -207,11 +207,11 @@ auto Game::Run() -> void {
   glm::vec3 cubePosition(0.0f, 0.0f, 0.0f);
   pdx::Portal portalA(pdx::Camera(glm::vec3(0.0f, 0.0f, 4.0f),
                                   glm::vec3(0.0f, 1.0f, 0.0f),
-                                  glm::vec3(0.0f, 0.0f, -1.0f), projection));
+                                  glm::vec3(0.0f, 0.0f, -1.0f)));
   portalA.AddAngle(180.0f, glm::vec3(0.0f, 0.0f, 1.0f));
   pdx::Portal portalB(pdx::Camera(glm::vec3(0.0f, 0.0f, -4.0f),
                                   glm::vec3(0.0f, 1.0f, 0.0f),
-                                  glm::vec3(0.0f, 0.0f, 1.0f), projection));
+                                  glm::vec3(0.0f, 0.0f, 1.0f)));
 
   portalA.SetDestination(&portalB);
   portalB.SetDestination(&portalA);
@@ -309,7 +309,6 @@ auto Game::Run() -> void {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    DrawPortals(camera.GetViewMatrix(), camera.GetProjectionMatrix(), 0);
 
     glm::vec3 moveDirection(0.0f);
     if (w) {
@@ -325,6 +324,7 @@ auto Game::Run() -> void {
       moveDirection.x += 1.0f;
     }
     camera.Move(moveDirection, delta);
+    DrawPortals(camera.GetViewMatrix(), projection, 0);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

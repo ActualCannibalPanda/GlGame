@@ -121,7 +121,8 @@ Game::Game(const std::string& title, int screenWidth, int screenHeight) {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
-
+  SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+  SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
   SDL_GL_SetSwapInterval(1);
@@ -284,7 +285,7 @@ auto Game::Run() -> void {
   SDL_Quit();
 }
 
-constexpr uint32_t MAX_RECURSION_LIMIT = 5;
+constexpr uint32_t MAX_RECURSION_LIMIT = 3;
 
 auto Game::DrawPortals(const glm::mat4& view, const glm::mat4& projection,
                        uint32_t recursionLevel) const -> void {

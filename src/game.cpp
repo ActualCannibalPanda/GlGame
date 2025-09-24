@@ -238,52 +238,39 @@ auto Game::Run() -> void {
 
     delta = (double)(now - last) / (double)SDL_GetPerformanceFrequency();
 
+    SDL_PumpEvents();
+
+    int numKeys;
+    const Uint8 *keyboardState = SDL_GetKeyboardState(&numKeys);
+    glm::vec3 moveDirection(0.0f);
+    if (keyboardState[SDL_SCANCODE_W]) {
+      moveDirection.z += 1.0f;
+    }
+    if (keyboardState[SDL_SCANCODE_S]) {
+      moveDirection.z -= 1.0f;
+    }
+    if (keyboardState[SDL_SCANCODE_A]) {
+      moveDirection.x -= 1.0f;
+    }
+    if (keyboardState[SDL_SCANCODE_D]) {
+      moveDirection.x += 1.0f;
+    }
+
+    camera.Move(moveDirection, delta);
+
+    if (keyboardState[SDL_SCANCODE_ESCAPE]) {
+      running = false;
+    }
+
+    int dx, dy;
+    SDL_GetRelativeMouseState(&dx, &dy);
+    camera.Look(dx, dy);
+
+    camera.Update(delta);
+
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       ImGui_ImplSDL2_ProcessEvent(&event);
-      switch (event.type) {
-      case SDL_QUIT:
-        running = false;
-        continue;
-      case SDL_MOUSEMOTION:
-        camera.Look((float)event.motion.xrel, (float)event.motion.yrel, delta);
-        break;
-      case SDL_KEYDOWN:
-        switch (event.key.keysym.sym) {
-        case SDLK_w:
-          w = true;
-          break;
-        case SDLK_s:
-          s = true;
-          break;
-        case SDLK_a:
-          a = true;
-          break;
-        case SDLK_d:
-          d = true;
-          break;
-        case SDLK_ESCAPE:
-          running = false;
-          continue;
-        }
-        break;
-      case SDL_KEYUP:
-        switch (event.key.keysym.sym) {
-        case SDLK_w:
-          w = false;
-          break;
-        case SDLK_s:
-          s = false;
-          break;
-        case SDLK_a:
-          a = false;
-          break;
-        case SDLK_d:
-          d = false;
-          break;
-        }
-        break;
-      }
     }
 
     ImGui_ImplOpenGL3_NewFrame();
@@ -309,21 +296,6 @@ auto Game::Run() -> void {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-
-    glm::vec3 moveDirection(0.0f);
-    if (w) {
-      moveDirection.z += 1.0f;
-    }
-    if (s) {
-      moveDirection.z -= 1.0f;
-    }
-    if (a) {
-      moveDirection.x -= 1.0f;
-    }
-    if (d) {
-      moveDirection.x += 1.0f;
-    }
-    camera.Move(moveDirection, delta);
     DrawPortals(camera.GetViewMatrix(), projection, 0);
 
     ImGui::Render();

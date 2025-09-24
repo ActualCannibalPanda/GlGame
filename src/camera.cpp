@@ -4,17 +4,18 @@
 
 using namespace pdx;
 
-Camera::Camera(const glm::vec3& position, const glm::vec3& up, float yaw,
-               float pitch)
+Camera::Camera(const glm::vec3& position, const glm::vec3& up,
+               const glm::mat4& projection, float yaw, float pitch)
     : m_Position(position), m_Up(up), m_WorldUp(up), m_Yaw(yaw), m_Pitch(pitch),
-      m_MovementSpeed(5.0f), m_Sensitivity(0.1f), m_Zoom(1.0f) {
+      m_Projection(projection), m_MovementSpeed(5.0f), m_Sensitivity(0.1f),
+      m_Zoom(1.0f) {
   UpdateCameraVectors();
 }
 Camera::Camera(const glm::vec3& position, const glm::vec3& up,
-               const glm::vec3& front)
+               const glm::vec3& front, const glm::mat4& projection)
     : m_Position(position), m_Up(up), m_Front(front), m_WorldUp(up),
-      m_Yaw(0.0f), m_Pitch(0.0f), m_MovementSpeed(5.0f), m_Sensitivity(0.1f),
-      m_Zoom(1.0f) {
+      m_Projection(projection), m_Yaw(0.0f), m_Pitch(0.0f),
+      m_MovementSpeed(5.0f), m_Sensitivity(0.1f), m_Zoom(1.0f) {
   UpdateYawAndPitch();
 }
 
@@ -74,8 +75,12 @@ auto Camera::GetRotationMatrix() const -> glm::mat4 {
   return R_z * R_y;
 }
 
+auto Camera::GetProjectionMatrix() const -> glm::mat4 {
+  return m_Projection;
+}
+
 auto Camera::GetViewFromCamera(const Camera& other) const -> glm:: mat4 {
-  return other.GetViewMatrix();
+  return glm::lookAt(other.m_Position, other.m_Position + other.m_Front, other.m_Up);
 }
 
 auto Camera::SetSpeed(float value) -> void {

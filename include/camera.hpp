@@ -6,10 +6,10 @@
 namespace pdx {
 class Camera {
 public:
-  Camera(const glm::vec3& position, const glm::vec3& up, float yaw = -90.0f,
-         float pitch = 0.0f);
   Camera(const glm::vec3& position, const glm::vec3& up,
-         const glm::vec3& forward);
+         const glm::mat4& projection, float yaw = -90.0f, float pitch = 0.0f);
+  Camera(const glm::vec3& position, const glm::vec3& up,
+         const glm::vec3& forward, const glm::mat4& projection);
 
   auto Move(const glm::vec3& direction, float delta) -> void;
   auto Look(float dx, float dy, float delta) -> void;
@@ -19,6 +19,7 @@ public:
 
   auto GetViewMatrix() const -> glm::mat4;
   auto GetViewFromCamera(const Camera& other) const -> glm::mat4;
+  auto GetProjectionMatrix() const -> glm::mat4;
   auto GetRotationMatrix() const -> glm::mat4;
 
   auto SetSpeed(float value) -> void;
@@ -31,6 +32,8 @@ private:
 
   int m_InvertMouseY = -1;
   int m_InvertMouseX = -1;
+
+  glm::mat4 m_Projection;
 
   glm::vec3 m_Position;
   glm::vec3 m_Front;

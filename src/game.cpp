@@ -27,25 +27,10 @@
 
 using namespace pdx;
 
-// clang-format off
-glm::vec3 cubePositions[] = {
-    glm::vec3( 0.0f,  0.0f,  0.0f), 
-    glm::vec3( 2.0f,  5.0f, -15.0f), 
-    glm::vec3(-1.5f, -2.2f, -2.5f),  
-    glm::vec3(-3.8f, -2.0f, -12.3f),  
-    glm::vec3( 2.4f, -0.4f, -3.5f),  
-    glm::vec3(-1.7f,  3.0f, -7.5f),  
-    glm::vec3( 1.3f, -2.0f, -2.5f),  
-    glm::vec3( 1.5f,  2.0f, -2.5f), 
-    glm::vec3( 1.5f,  0.2f, -1.5f), 
-    glm::vec3(-1.3f,  1.0f, -1.5f)  
-};
-// clang-format on
-
-auto GLAPIENTRY glDebugOutput(GLenum source, GLenum type, unsigned int id,
-                              GLenum severity, GLsizei length,
-                              const char *message, const void *userParam)
-    -> void {
+static auto GLAPIENTRY glDebugOutput(GLenum source, GLenum type,
+                                     unsigned int id, GLenum severity,
+                                     GLsizei length, const char *message,
+                                     const void *userParam) -> void {
   // ignore non-significant error/warning codes
   if (id == 131169 || id == 131185 || id == 131218 || id == 131204)
     return;
@@ -178,12 +163,6 @@ Game::Game(const std::string& title, int screenWidth, int screenHeight) {
 }
 
 auto Game::Run() -> void {
-  pdx::Shader simpleShader("simple.vert", "simple.frag");
-  pdx::Shader singleColorShader("singleColor.vert", "singleColor.frag");
-  pdx::Shader lightShader("light.vert", "light.frag");
-
-  glEnable(GL_DEPTH_TEST);
-
   glm::mat4 projection = glm::perspective(
       glm::radians(45.0f), (float)m_WindowWidth / (float)m_WindowHeight, 0.1f,
       100.0f);
@@ -193,13 +172,6 @@ auto Game::Run() -> void {
   pdx::AssetDir cubeDir{"data", "models", "cube"};
   pdx::Model cube = pdx::Model::FromGLTF(cubeDir.GetFile("scene.gltf")).value();
 
-  pdx::AssetDir portalDir{"data", "models", "portal"};
-  pdx::Model portal =
-      pdx::Model::FromGLTF(portalDir.GetFile("scene.gltf")).value();
-
-  pdx::AssetDir portalFrameDir{"data", "models", "portalFrame"};
-  pdx::Model portalFrame =
-      pdx::Model::FromGLTF(portalFrameDir.GetFile("scene.gltf")).value();
   pdx::AssetDir floorDir{"data", "models", "floor"};
   pdx::Model floor =
       pdx::Model::FromGLTF(floorDir.GetFile("scene.gltf")).value();

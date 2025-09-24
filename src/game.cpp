@@ -341,7 +341,7 @@ auto Game::Run() -> void {
   SDL_Quit();
 }
 
-constexpr uint32_t MAX_RECURSION_LIMIT = 5;
+constexpr uint32_t MAX_RECURSION_LIMIT = 3;
 
 auto Game::DrawPortals(const glm::mat4& view, const glm::mat4& projection,
                        uint32_t recursionLevel) const -> void {
@@ -364,7 +364,10 @@ auto Game::DrawPortals(const glm::mat4& view, const glm::mat4& projection,
 
     portal.DrawPortalPlane(view, projection, singleColorShader);
 
-    glm::mat4 destView = portal.ViewMatrix();
+    glm::mat4 destView = view * portal.ModelMatrix() *
+                         glm::rotate(glm::mat4(1.0f), glm::radians(180.0f),
+                                     glm::vec3(0.0f, 0.0f, 1.0f)) *
+                         glm::inverse(portal.GetDestination()->ModelMatrix());
 
     if (recursionLevel == MAX_RECURSION_LIMIT) {
       // renenable color and depth mask
@@ -376,9 +379,10 @@ auto Game::DrawPortals(const glm::mat4& view, const glm::mat4& projection,
       glStencilMask(0x00);
       glStencilFunc(GL_EQUAL, recursionLevel + 1, 0xFF);
 
-      DrawLevel(destView, projection);
+      DrawLevel(destView, portal.ClippedProj(destView, projection));
     } else {
-      DrawPortals(destView, projection, recursionLevel + 1);
+      DrawPortals(destView, portal.ClippedProj(destView, projection),
+                  recursionLevel + 1);
     }
 
     glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
@@ -429,7 +433,7 @@ auto Game::DrawLevel(const glm::mat4& view, const glm::mat4& projection) const
   {
     glm::mat4 model =
         glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -3.0, 0.0f)),
-                   glm::vec3(3.0f, 1.0f, 3.0f));
+                   glm::vec3(10.0f, 1.0f, 10.0f));
     shader.SetMat4fv("model", model);
     shader.SetMat4fv("view", view);
     shader.SetMat4fv("projection", projection);
@@ -438,7 +442,7 @@ auto Game::DrawLevel(const glm::mat4& view, const glm::mat4& projection) const
   shader.Use();
   {
     glm::mat4 model =
-        glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0, 0.0f)),
+        glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.2f, 0.0, 0.0f)),
                    glm::vec3(1.0f, 1.0f, 1.0f));
     shader.SetMat4fv("model", model);
     shader.SetMat4fv("view", view);

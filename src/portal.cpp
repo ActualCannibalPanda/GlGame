@@ -61,24 +61,23 @@ auto Portal::GetCamera() const -> pdx::Camera { return m_Viewpoint; }
 
 auto Portal::ClippedProj(const glm::mat4& view, const glm::mat4& proj) const
     -> glm::mat4 {
-  float dist = glm::length(Position());
-  glm::vec4 clipPlane(Front(), dist);
-  clipPlane = glm::inverse(glm::transpose(view)) * clipPlane;
-
-  if (clipPlane.w > 0.0f)
+  float d = glm::length(Position());
+  glm::vec3 newClipPlaneNormal = Front();
+  // Calculate the clip plane with a normal and distance to the origin
+  glm::vec4 newClipPlane(newClipPlaneNormal, d);
+  newClipPlane = glm::inverse(glm::transpose(view)) * newClipPlane;
+  // If the new clip plane's fourth component (w) is greater than 0, indicating
+  // that it is facing away from the camera,
+  if (newClipPlane.w > 0.0f)
     return proj;
-
   glm::vec4 q =
-      glm::inverse(proj) *
-      glm::vec4(glm::sign(clipPlane.x), glm::sign(clipPlane.y), 1.0f, 1.0f);
-
-  glm::vec4 c = clipPlane * (2.0f / (glm::dot(clipPlane, q)));
-
-  glm::mat4 newProj = proj;
-  // third row = clip plane - fourth row
-  newProj = glm::row(newProj, 2, c - glm::row(newProj, 3));
-
-  return newProj;
+      glm::inverse(proj) * glm::vec4(glm::sign(newClipPlane.x),
+                                     glm::sign(newClipPlane.y), 1.0f, 1.0f);
+  glm::vec4 c = newClipPlane * (2.0f / (glm::dot(newClipPlane, q)));
+  glm::mat4 newProjMat = proj;
+  // third row = new clip plane - fourth row of projection matrix
+  newProjMat = glm::row(newProjMat, 2, c - glm::row(newProjMat, 3));
+  return newProjMat;
 }
 
 auto Portal::SetDestination(pdx::Portal *portal) -> void {

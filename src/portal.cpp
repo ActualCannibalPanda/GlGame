@@ -59,7 +59,6 @@ auto Portal::ModelMatrix() const -> glm::mat4 { return m_ModelMatrix; }
 auto Portal::ViewMatrix() const -> glm::mat4 {
   return m_Viewpoint.GetViewMatrix();
 }
-auto Portal::GetCamera() const -> pdx::Camera { return m_Viewpoint; }
 
 auto Portal::ClippedProj(const glm::mat4& view, const glm::mat4& proj) const
     -> glm::mat4 {

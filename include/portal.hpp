@@ -14,7 +14,6 @@ public:
   auto Front() const -> glm::vec3;
   auto ModelMatrix() const -> glm::mat4;
   auto ViewMatrix() const -> glm::mat4;
-  auto GetCamera() const -> pdx::Camera;
 
   auto DrawPortalFrame(const glm::mat4& view, const glm::mat4& proj,
                        const pdx::Shader& shader) const -> void;

@@ -9,12 +9,17 @@ public:
   Camera(const glm::vec3& position, const glm::vec3& up,
          const glm::vec3& forward);
 
-  auto Update(float delta) -> void;
+  auto Update() -> void;
   auto Move(const glm::vec3& direction, float delta) -> void;
   auto Look(float dx, float dy) -> void;
 
   auto Front() const -> glm::vec3;
   auto Position() const -> glm::vec3;
+  auto Right() const -> glm::vec3;
+
+  auto SetPosition(const glm::vec3& position) -> void;
+
+  auto SetFront(const glm::vec3& front) -> void;
 
   auto GetViewMatrix() const -> glm::mat4;
 

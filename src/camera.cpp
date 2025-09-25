@@ -16,11 +16,12 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& up,
   UpdateYawAndPitch();
 }
 
-auto Camera::Update(float delta) -> void {
+auto Camera::Update() -> void {
   m_Yaw += (m_TargetYaw - m_Yaw) * 0.5f;
   m_Pitch += (m_TargetPitch - m_Pitch) * 0.5f;
   UpdateCameraVectors();
 }
+
 auto Camera::Move(const glm::vec3& direction, float delta) -> void {
   m_Position += m_Front * direction.z * m_MovementSpeed * delta;
   m_Position += m_Right * direction.x * m_MovementSpeed * delta;
@@ -37,11 +38,24 @@ auto Camera::Look(float dx, float dy) -> void {
   if (m_TargetPitch < -89.0f) {
     m_TargetPitch = -89.0f;
   }
+
+  UpdateCameraVectors();
 }
 
 auto Camera::Front() const -> glm::vec3 { return m_Front; }
 
 auto Camera::Position() const -> glm::vec3 { return m_Position; }
+
+auto Camera::Right() const -> glm::vec3 { return m_Right; }
+
+auto Camera::SetPosition(const glm::vec3& position) -> void {
+  m_Position = position;
+}
+
+auto Camera::SetFront(const glm::vec3& front) -> void {
+  m_Front = front;
+  UpdateYawAndPitch();
+}
 
 auto Camera::GetViewMatrix() const -> glm::mat4 {
   return glm::lookAt(m_Position, m_Position + m_Front, m_Up);
@@ -80,7 +94,6 @@ auto Camera::UpdateCameraVectors(bool calcFront) -> void {
 
 auto Camera::UpdateYawAndPitch() -> void {
   glm::vec3 vec = m_Front;
-  glm::mat4 view = GetViewMatrix();
   m_TargetYaw = m_Yaw = glm::degrees(atan2(vec.x, vec.z));
   m_TargetPitch = m_Pitch = glm::degrees(asin(vec.y));
   UpdateCameraVectors(false);

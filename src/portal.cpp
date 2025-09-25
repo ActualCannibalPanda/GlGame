@@ -2,9 +2,6 @@
 #include "assetdir.hpp"
 #include "model.hpp"
 
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/ext/quaternion_trigonometric.hpp>
-#include <glm/fwd.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtc/quaternion.hpp>
 
@@ -55,6 +52,7 @@ auto Portal::DrawPortalPlane(const glm::mat4& view, const glm::mat4& proj,
 
 auto Portal::Position() const -> glm::vec3 { return m_Viewpoint.Position(); }
 auto Portal::Front() const -> glm::vec3 { return m_Viewpoint.Front(); }
+auto Portal::Right() const -> glm::vec3 { return m_Viewpoint.Right(); }
 auto Portal::ModelMatrix() const -> glm::mat4 { return m_ModelMatrix; }
 auto Portal::ViewMatrix() const -> glm::mat4 {
   return m_Viewpoint.GetViewMatrix();

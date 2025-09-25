@@ -211,6 +211,38 @@ auto Game::Run() -> void {
 
     delta = (double)(now - last) / (double)SDL_GetPerformanceFrequency();
 
+    for (const auto& portal : m_Portals) {
+      if (glm::dot(camera.Front(), portal.Front()) < 0.0f) {
+        // n = normal of plane
+        // v = camera vector
+        // p0 = origin of ray
+        // a = other point on plane
+        // t = length of ray that intersects plan
+        // t = (a - p0).n / v.n
+        glm::vec3 n = portal.Front();
+        glm::vec3 v = camera.Position() + camera.Front();
+        float vdotn = glm::dot(v, n);
+
+        if (vdotn == 0) {
+          continue;
+        }
+
+        glm::vec3 p0 = camera.Position();
+        glm::vec3 a = portal.Position() + portal.Right();
+
+        // TODO: Currently the plane is infinite so restrict the teleport to
+        // inside the portal
+        glm::vec pa = a - p0;
+        float t = glm::dot(pa, n) / vdotn;
+        if (t > 0.0f && t < 0.1f) {
+          auto pos = camera.Position() - portal.Position();
+          camera.SetFront(portal.GetDestination()->Front());
+          camera.SetPosition(portal.GetDestination()->Position() + pos);
+          break;
+        }
+      }
+    }
+
     SDL_PumpEvents();
 
     int numKeys;
@@ -239,7 +271,7 @@ auto Game::Run() -> void {
     SDL_GetRelativeMouseState(&dx, &dy);
     camera.Look(dx, dy);
 
-    camera.Update(delta);
+    camera.Update();
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {

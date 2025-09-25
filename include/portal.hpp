@@ -12,6 +12,7 @@ public:
 
   auto Position() const -> glm::vec3;
   auto Front() const -> glm::vec3;
+  auto Right() const -> glm::vec3;
   auto ModelMatrix() const -> glm::mat4;
   auto ViewMatrix() const -> glm::mat4;
 

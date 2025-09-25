@@ -10,6 +10,7 @@
 #include <glm/geometric.hpp>
 
 #include <glm/matrix.hpp>
+#include <glm/trigonometric.hpp>
 #include <iostream>
 
 #include "assetdir.hpp"
@@ -235,8 +236,13 @@ auto Game::Run() -> void {
         glm::vec pa = a - p0;
         float t = glm::dot(pa, n) / vdotn;
         if (t > 0.0f && t < 0.1f) {
+          auto destination = portal.GetDestination();
           auto pos = camera.Position() - portal.Position();
-          camera.SetFront(portal.GetDestination()->Front());
+          if (glm::dot(camera.Front(), destination->Front()) < 0) {
+            // TODO: adjust rotation depeding on negative dot product
+            camera.SetFront(portal.GetDestination()->Front() *
+                            portal.Orientation());
+          }
           camera.SetPosition(portal.GetDestination()->Position() + pos);
           break;
         }

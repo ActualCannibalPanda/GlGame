@@ -181,7 +181,7 @@ auto Game::Run() -> void {
   pdx::Portal portalA(pdx::Camera(glm::vec3(0.0f, 0.0f, 4.0f),
                                   glm::vec3(0.0f, 1.0f, 0.0f),
                                   glm::vec3(0.0f, 0.0f, -1.0f)));
-  portalA.AddAngle(180.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+  portalA.AddAngle(180.0f, glm::vec3(0.0f, 1.0f, 0.0f));
   pdx::Portal portalB(pdx::Camera(glm::vec3(0.0f, 0.0f, -4.0f),
                                   glm::vec3(0.0f, 1.0f, 0.0f),
                                   glm::vec3(0.0f, 0.0f, 1.0f)));
@@ -235,9 +235,10 @@ auto Game::Run() -> void {
         glm::vec pa = a - p0;
         float t = glm::dot(pa, n) / vdotn;
         if (t > 0.0f && t < 0.1f) {
-          auto pos = camera.Position() - portal.Position();
-          camera.SetFront(portal.GetDestination()->Front());
-          camera.SetPosition(portal.GetDestination()->Position() + pos);
+          auto dest = *portal.GetDestination();
+          camera.SetFront(dest.Front() + camera.Front());
+          camera.SetPosition(dest.Position() + camera.Position() +
+                             dest.Position());
           break;
         }
       }

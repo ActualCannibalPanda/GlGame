@@ -1,4 +1,5 @@
 #include "model.hpp"
+#include "types.hpp"
 
 #include <glad/gl.h>
 
@@ -18,9 +19,9 @@
 
 using namespace pdx;
 
-Model::Model(tinygltf::Model& model, pdx::vao_t vao, std::map<int, GLuint> ebos,
-             std::map<int, GLuint> textures)
-    : m_Model(model), m_Vao(vao), m_Ebos(ebos), m_Textures(textures) {}
+Model::Model(tinygltf::Model& model, std::map<std::string, pdx::vao_t> vaos,
+             std::map<int, GLuint> ebos, std::map<int, GLuint> textures)
+    : m_Model(model), m_Vaos(vaos), m_Ebos(ebos), m_Textures(textures) {}
 
 static auto LoadModel(tinygltf::Model& model, const std::filesystem::path& path)
     -> bool {
@@ -170,46 +171,70 @@ std::optional<Model> Model::FromGLTF(const std::filesystem::path& path) {
     return {};
   }
 
+  std::map<std::string, pdx::vao_t> vaos;
   std::map<int, GLuint> vbos, textures;
-  GLuint vao;
-  glGenVertexArrays(1, &vao);
-  glBindVertexArray(vao);
 
   const tinygltf::Scene& scene = model.scenes[model.defaultScene];
   for (size_t i = 0; i < scene.nodes.size(); ++i) {
     assert((scene.nodes[i] >= 0) && (scene.nodes[i] < model.nodes.size()));
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
     BindModelNodes(vbos, textures, model, model.nodes[scene.nodes[i]]);
-  }
-
-  glBindVertexArray(0);
-  // cleanup vbos but do not delete index buffers yet
-  for (auto it = vbos.cbegin(); it != vbos.cend();) {
-    tinygltf::BufferView bufferView = model.bufferViews[it->first];
-    if (bufferView.target != GL_ELEMENT_ARRAY_BUFFER) {
-      glDeleteBuffers(1, &vbos[it->first]);
-      vbos.erase(it++);
-    } else {
-      ++it;
+    glBindVertexArray(0);
+    // cleanup vbos but do not delete index buffers yet
+    for (auto it = vbos.cbegin(); it != vbos.cend();) {
+      tinygltf::BufferView bufferView = model.bufferViews[it->first];
+      if (bufferView.target != GL_ELEMENT_ARRAY_BUFFER) {
+        glDeleteBuffers(1, &vbos[it->first]);
+        vbos.erase(it++);
+      } else {
+        ++it;
+      }
     }
+    vaos[model.nodes[scene.nodes[i]].name] = vao;
   }
-  return std::make_optional(Model(model, vao, vbos, textures));
+  return std::make_optional(pdx::Model(model, vaos, vbos, textures));
 }
 
 auto Model::Draw() const -> void {
-  glBindVertexArray(m_Vao);
-  for (size_t i = 0; i < m_Textures.size(); ++i) {
-    glActiveTexture(GL_TEXTURE0 + i);
-    glBindTexture(GL_TEXTURE_2D, m_Textures.at(i));
-  }
   const tinygltf::Scene& scene = m_Model.scenes[m_Model.defaultScene];
   for (size_t i = 0; i < scene.nodes.size(); ++i) {
+    glBindVertexArray(m_Vaos.at(m_Model.nodes[scene.nodes[i]].name));
+    for (size_t i = 0; i < m_Textures.size(); ++i) {
+      glActiveTexture(GL_TEXTURE0 + i);
+      glBindTexture(GL_TEXTURE_2D, m_Textures.at(i));
+    }
     DrawNodes(m_Model.nodes[scene.nodes[i]]);
+
+    for (size_t i = 0; i < m_Textures.size(); ++i) {
+      glActiveTexture(GL_TEXTURE0 + i);
+      glBindTexture(GL_TEXTURE_2D, 0);
+    }
+    glBindVertexArray(0);
   }
-  for (size_t i = 0; i < m_Textures.size(); ++i) {
-    glActiveTexture(GL_TEXTURE0 + i);
-    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+auto Model::Draw(const std::string& name) const -> void {
+  const tinygltf::Scene& scene = m_Model.scenes[m_Model.defaultScene];
+  for (size_t i = 0; i < scene.nodes.size(); ++i) {
+    if (m_Model.nodes[scene.nodes[i]].name == name) {
+      glBindVertexArray(m_Vaos.at(m_Model.nodes[scene.nodes[i]].name));
+      for (size_t i = 0; i < m_Textures.size(); ++i) {
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, m_Textures.at(i));
+      }
+
+      DrawNodes(m_Model.nodes[scene.nodes[i]]);
+
+      for (size_t i = 0; i < m_Textures.size(); ++i) {
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, 0);
+      }
+      glBindVertexArray(0);
+      break;
+    }
   }
-  glBindVertexArray(0);
 }
 
 auto Model::DrawNodes(const tinygltf::Node& node) const -> void {

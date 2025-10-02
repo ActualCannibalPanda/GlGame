@@ -2,26 +2,20 @@
 #include "assetdir.hpp"
 #include "model.hpp"
 
+#include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtc/quaternion.hpp>
 
 using namespace pdx;
 
-static AssetDir portalPlaneDir{"data", "models", "portal"};
-static AssetDir portalFrameDir{"data", "models", "portalFrame"};
-static std::optional<pdx::Model> portalPlane = {};
-static std::optional<pdx::Model> portalFrame = {};
+static AssetDir portalDir{"data", "models", "portal"};
+static std::optional<pdx::Model> portal = {};
 
 Portal::Portal(const pdx::Camera& viewpoint) : m_Viewpoint(viewpoint) {
-  if (!portalPlane.has_value()) {
-    portalPlane = pdx::Model::FromGLTF(portalPlaneDir.GetFile("scene.gltf"));
+  if (!portal.has_value()) {
+    portal = pdx::Model::FromGLTF(portalDir.GetFile("scene.gltf"));
   }
-  if (!portalFrame.has_value()) {
-    portalFrame = pdx::Model::FromGLTF(portalFrameDir.GetFile("scene.gltf"));
-  }
-  m_Orientation =
-      glm::fquat(1.0f, 0.0f, 0.0f, 0.0f) *
-      glm::angleAxis(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+  m_Orientation = glm::fquat(1.0f, 0.0f, 0.0f, 0.0f);
   m_ModelMatrix = glm::mat4(1.0);
   m_ModelMatrix = glm::translate(m_ModelMatrix, m_Viewpoint.Position()) *
                   glm::mat4_cast(m_Orientation);
@@ -29,24 +23,23 @@ Portal::Portal(const pdx::Camera& viewpoint) : m_Viewpoint(viewpoint) {
 
 auto Portal::DrawPortalFrame(const glm::mat4& view, const glm::mat4& proj,
                              const pdx::Shader& shader) const -> void {
-  if (portalFrame.has_value()) {
+  if (portal.has_value()) {
     shader.Use();
     shader.SetMat4fv("model", m_ModelMatrix);
     shader.SetMat4fv("view", view);
     shader.SetMat4fv("projection", proj);
-    portalFrame->Draw();
+    portal->Draw("Frame");
   }
 }
 
 auto Portal::DrawPortalPlane(const glm::mat4& view, const glm::mat4& proj,
                              const pdx::Shader& shader) const -> void {
-  if (portalPlane.has_value()) {
+  if (portal.has_value()) {
     shader.Use();
-    shader.SetMat4fv("model",
-                     glm::scale(m_ModelMatrix, glm::vec3(2.0f, 2.0f, 2.0f)));
+    shader.SetMat4fv("model", m_ModelMatrix);
     shader.SetMat4fv("view", view);
     shader.SetMat4fv("projection", proj);
-    portalPlane->Draw();
+    portal->Draw("Portal");
   }
 }
 

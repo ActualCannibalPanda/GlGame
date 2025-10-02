@@ -14,19 +14,20 @@ namespace pdx {
 class Model {
 public:
   auto Draw() const -> void;
+  auto Draw(const std::string& name) const -> void;
 
   static auto FromGLTF(const std::filesystem::path& file)
       -> std::optional<Model>;
 
 private:
-  Model(tinygltf::Model& model, pdx::vao_t vao, std::map<int, GLuint> vbos,
-        std::map<int, GLuint> textures);
+  Model(tinygltf::Model& model, std::map<std::string, pdx::vao_t> vaos,
+        std::map<int, GLuint> vbos, std::map<int, GLuint> textures);
 
   auto DrawMesh(const tinygltf::Mesh& mesh) const -> void;
   auto DrawNodes(const tinygltf::Node& node) const -> void;
 
   tinygltf::Model m_Model;
-  pdx::vao_t m_Vao;
+  std::map<std::string, pdx::vao_t> m_Vaos;
   std::map<int, pdx::ebo_t> m_Ebos;
   std::map<int, GLuint> m_Textures;
 };
